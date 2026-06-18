@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>国防教育知识刷题</title>
+<style>
+:root {
+  --primary: #4f46e5;
+  --primary-light: #6366f1;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --bg: #f8fafc;
+  --card-bg: #ffffff;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,.1);
+  --radius: 12px;
+  --transition: 0.2s cubic-bezier(.4,0,.2,1);
+}
+
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --card-bg: #1e293b;
+  --text: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --border: #334155;
+  --shadow: 0 1px 3px rgba(0,0,0,.3);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,.4);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 32px 0 20px;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 4px;
+}
+
+.header .subtitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* Stats Bar */
+.stats-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  min-width: 80px;
+}
+
+.stat-card .stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.stat-card .stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.stat-card.correct .stat-value { color: var(--success); }
+.stat-card.wrong .stat-value { color: var(--danger); }
+.stat-card.total .stat-value { color: var(--text); }
+.stat-card.timer .stat-value { color: #f59e0b; font-variant-numeric: tabular-nums; font-family: "SF Mono", "Consolas", "Courier New", monospace; font-size: 20px; }
+
+/* Controls */
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.btn.primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.btn.primary:hover {
+  background: var(--primary-light);
+}
+
+.btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Progress */
+.progress-container {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+
+.progress-bar {
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #8b5cf6);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Question Card */
+.question-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  position: relative;
+}
+
+.question-card.answered-correct {
+  border-color: var(--success);
+  background: linear-gradient(135deg, rgba(16,185,129,.05), var(--card-bg));
+}
+
+.question-card.answered-wrong {
+  border-color: var(--danger);
+  background: linear-gradient(135deg, rgba(239,68,68,.05), var(--card-bg));
+}
+
+.question-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.question-number.correct-num { background: var(--success); }
+.question-number.wrong-num { background: var(--danger); }
+.question-number.unanswered { background: var(--text-secondary); }
+
+.question-text {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--card-bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+  font-size: 14px;
+  font-family: inherit;
+  width: 100%;
+}
+
+.option-btn:hover:not(.disabled) {
+  border-color: var(--primary);
+  background: rgba(79,70,229,.05);
+}
+
+.option-btn .option-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+
+.option-btn:hover:not(.disabled) .option-label {
+  background: var(--primary);
+  color: #fff;
+}
+
+.option-btn.selected {
+  border-color: var(--primary);
+  background: rgba(79,70,229,.08);
+}
+
+.option-btn.selected .option-label {
+  background: var(--primary);
+  color: #fff;
+}
+
+.option-btn.correct-answer {
+  border-color: var(--success) !important;
+  background: rgba(16,185,129,.1) !important;
+}
+
+.option-btn.correct-answer .option-label {
+  background: var(--success) !important;
+  color: #fff !important;
+}
+
+.option-btn.wrong-answer {
+  border-color: var(--danger) !important;
+  background: rgba(239,68,68,.1) !important;
+}
+
+.option-btn.wrong-answer .option-label {
+  background: var(--danger) !important;
+  color: #fff !important;
+}
+
+.option-btn.disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.option-btn.disabled:hover {
+  border-color: var(--border);
+  background: var(--card-bg);
+}
+
+.option-btn.disabled:hover .option-label {
+  background: var(--border);
+  color: var(--text-secondary);
+}
+
+.feedback {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  display: none;
+}
+
+.feedback.show { display: block; }
+.feedback.correct { background: rgba(16,185,129,.1); color: var(--success); }
+.feedback.wrong { background: rgba(239,68,68,.1); color: var(--danger); }
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state svg {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  opacity: 0.4;
+}
+
+.empty-state h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+/* Pagination / Navigation */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* Filter tabs */
+.filter-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+.filter-tab {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.filter-tab.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  z-index: 100;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .header h1 { font-size: 22px; }
+  .question-text { font-size: 15px; }
+  .stats-bar { gap: 6px; }
+  .stat-card { padding: 8px 14px; min-width: 60px; }
+  .stat-card .stat-value { font-size: 20px; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" title="切换主题">
+  <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+</button>
+
+<div class="container">
+  <div class="header">
+    <h1>国防教育知识刷题</h1>
+    <p class="subtitle">共 <span id="totalCount">0</span> 题 · 助力国防教育学习</p>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-card total">
+      <div class="stat-value" id="statAnswered">0</div>
+      <div class="stat-label">已答</div>
+    </div>
+    <div class="stat-card correct">
+      <div class="stat-value" id="statCorrect">0</div>
+      <div class="stat-label">正确</div>
+    </div>
+    <div class="stat-card wrong">
+      <div class="stat-value" id="statWrong">0</div>
+      <div class="stat-label">错误</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="statAccuracy">-</div>
+      <div class="stat-label">正确率</div>
+    </div>
+    <div class="stat-card timer">
+      <div class="stat-value" id="statTimer">00:00</div>
+      <div class="stat-label">用时</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn active" data-mode="all" onclick="setMode('all')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+      全部题目
+    </button>
+    <button class="btn" data-mode="unanswered" onclick="setMode('unanswered')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      未答题
+    </button>
+    <button class="btn" data-mode="wrong" onclick="setMode('wrong')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+      错题集
+    </button>
+    <button class="btn" data-mode="random" onclick="setMode('random')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+      随机刷题
+    </button>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <div class="progress-text">
+      <span id="progressLabel">进度 0/0</span>
+      <span id="progressPercent">0%</span>
+    </div>
+  </div>
+
+  <div id="questionsContainer">
+    <!-- Questions render here -->
+  </div>
+
+  <div class="nav-buttons" id="navButtons" style="display:none;">
+    <button class="btn" id="prevBtn" onclick="prevPage()" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      上一页
+    </button>
+    <span style="line-height:40px;color:var(--text-secondary);font-size:14px;" id="pageInfo">第 1 页</span>
+    <button class="btn" id="nextBtn" onclick="nextPage()">
+      下一页
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// ─── Quiz Data ────────────────────────────────────────
+const QUIZ_DATA = [{"id": 1, "question": "根据宪法、国家安全法的规定，负责宣布进入紧急状态、战争状态的，发布动员令的是()。(1分)", "options": [{"label": "A", "text": "国务院"}, {"label": "B", "text": "全国人大"}, {"label": "C", "text": "国家主席"}, {"label": "D", "text": "全国人大常委会"}], "answer": "B全国人大", "answerLabel": "B"}, {"id": 2, "question": "()是一个国家赖以存在的战略空间，是国家存在和发展的自然物质前提，是构成国家的基本要素之一。(1分)", "options": [{"label": "C", "text": "领土"}, {"label": "D", "text": "安全"}], "answer": "C领土", "answerLabel": "C"}, {"id": 3, "question": "《中华人民共和国国防法》明确了()。", "options": [{"label": "A", "text": "中国共产党对武装力量的领导"}, {"label": "B", "text": "我国现行的兵役制度"}, {"label": "C", "text": "高校应设置国防教育课程"}, {"label": "D", "text": "人民防空的方针"}], "answer": "A中国共产党对武装力量的领导", "answerLabel": "A"}, {"id": 4, "question": "中国的国家战略目标,就是实现在()成立一百年时全面建成小康社会、在()成立一百年时建成富强民主文明和谐的社会主义现代化国家的奋斗目标。", "options": [{"label": "A", "text": "中国共产党新中国"}, {"label": "B", "text": "新中国中国共产党"}], "answer": "A中国共产党新中国", "answerLabel": "A"}, {"id": 5, "question": "《国防法》是由()制定的。", "options": [{"label": "A", "text": "中央军委"}, {"label": "B", "text": "全国人大"}, {"label": "C", "text": "国务院"}, {"label": "D", "text": "战区"}], "answer": "B全国人大", "answerLabel": "B"}, {"id": 6, "question": "我国空军军成立于()。(1分)", "options": [{"label": "A", "text": "19270801"}, {"label": "B", "text": "19490423"}, {"label": "C", "text": "19491111"}, {"label": "D", "text": "19660701"}], "answer": "C 19491111", "answerLabel": "C"}, {"id": 7, "question": "()虽然推翻了清朝的统治，建立了中华民国，但并没有改变中国任人宰割的状况。", "options": [{"label": "A", "text": "辛亥革命"}, {"label": "B", "text": "南昌起义"}, {"label": "C", "text": "广州起义"}, {"label": "D", "text": "秋收起义"}], "answer": "A辛亥革命", "answerLabel": "A"}, {"id": 8, "question": "1945年抗日战争胜利后，为避免内战、争取和平，中国共产党与国民党政府进行的为期43天的和平谈判，史称()谈判。", "options": [{"label": "A", "text": "重庆"}, {"label": "B", "text": "南京"}, {"label": "C", "text": "北平"}, {"label": "D", "text": "西安"}], "answer": "A重庆", "answerLabel": "A"}, {"id": 9, "question": "()是国家或政治集团所拥有的各种武装组织的总称。(1分)", "options": [{"label": "A", "text": "军事力量"}, {"label": "B", "text": "国防力量"}, {"label": "C", "text": "武装力量"}, {"label": "D", "text": "综合力量"}], "answer": "C武装力量", "answerLabel": "C"}, {"id": 10, "question": "()是不脱离生产的群众武装组织，是中国武装力量的重要组成部分，是人民解放军的助手和后备力量。", "options": [{"label": "A", "text": "中国人民解放军"}, {"label": "B", "text": "中国人民武装警察部队"}, {"label": "C", "text": "民兵"}], "answer": "C民兵", "answerLabel": "C"}, {"id": 11, "question": "()是中国武装力量的主体力量。", "options": [{"label": "A", "text": "中国人民解放军"}, {"label": "B", "text": "中国人民武装警察部队"}, {"label": "C", "text": "民兵"}], "answer": "A中国人民解放军", "answerLabel": "A"}, {"id": 12, "question": "战时宣传教育和面向社会的思想发动属于()。(1分)", "options": [{"label": "A", "text": "武装力量动员"}, {"label": "B", "text": "人民防空动员"}, {"label": "C", "text": "信息动员"}, {"label": "D", "text": "政治动员"}], "answer": "D政治动员", "answerLabel": "D"}, {"id": 13, "question": "根据我国的社会制度和国家政策，中国的国防类型是()。", "options": [{"label": "A", "text": "联盟型"}, {"label": "B", "text": "扩张型"}, {"label": "C", "text": "自卫型"}, {"label": "D", "text": "中立型"}], "answer": "C自卫型", "answerLabel": "C"}, {"id": 14, "question": "中国人民解放军陆军成立于()。(1分)", "options": [{"label": "A", "text": "19270801"}, {"label": "B", "text": "19490423"}, {"label": "C", "text": "19660701"}, {"label": "D", "text": "19491112"}], "answer": "A19270801", "answerLabel": "A"}, {"id": 15, "question": "1895年在()中，日本逼迫清政府将钓鱼岛群岛随同台湾一起割让给了日本。(1分)", "options": [{"label": "A", "text": "“二十一条”"}, {"label": "B", "text": "《辛丑条约》"}, {"label": "C", "text": "《东三省事宜条约》"}, {"label": "D", "text": "《马关条约》"}], "answer": "D《马关条约》", "answerLabel": "D"}, {"id": 16, "question": "中国发展核武器的主要目的是()。(1分)", "options": [{"label": "A", "text": "发动核战争"}, {"label": "B", "text": "遏制核战争"}, {"label": "C", "text": "核讹诈"}], "answer": "B遏制核战争", "answerLabel": "B"}, {"id": 17, "question": "中国规定男士服义务兵役时间长度为()。(1分)", "options": [{"label": "A", "text": "3"}, {"label": "B", "text": "5"}, {"label": "C", "text": "2"}, {"label": "D", "text": "7"}], "answer": "C2", "answerLabel": "C"}, {"id": 18, "question": "()是新时代中国国防的战略指导。(1分)", "options": [{"label": "A", "text": "坚持永不称霸"}, {"label": "B", "text": "坚决捍卫国家主权、安全、发展利益坚持走中国特色强军之路"}, {"label": "C", "text": "贯彻落实新时代军事战略方针"}], "answer": "C贯彻落实新时代军事战略方针", "answerLabel": "C"}, {"id": 19, "question": "()是对付外来侵略的最根本、最有效手段。(1分)", "options": [{"label": "A", "text": "军事手段"}, {"label": "B", "text": "科技手段"}, {"label": "C", "text": "经济手段"}, {"label": "D", "text": "外交手段"}], "answer": "A军事手段", "answerLabel": "A"}, {"id": 20, "question": "()是人民军队性质和宗旨不变的根本保证。(1分)", "options": [{"label": "A", "text": "中国共产党的绝对领导"}, {"label": "B", "text": "紧密联系群众"}, {"label": "C", "text": "党支部建在连上"}, {"label": "D", "text": "坚持政治工作民主制"}], "answer": "A中国共产党的绝对领导", "answerLabel": "A"}, {"id": 21, "question": "1937年()事变爆发，全面抗战由此开始。(1分)", "options": [{"label": "A", "text": "九一八"}, {"label": "B", "text": "一二八"}, {"label": "C", "text": "华北"}, {"label": "D", "text": "卢沟桥"}], "answer": "D卢沟桥", "answerLabel": "D"}, {"id": 22, "question": "我国全民国家安全教育日是()。(1分)", "options": [{"label": "A", "text": "每年4月15日"}, {"label": "B", "text": "每年4月24日"}, {"label": "C", "text": "每年5月12日"}, {"label": "D", "text": "每年10月15日"}], "answer": "A每年4月15日", "answerLabel": "A"}, {"id": 23, "question": "()虽然推翻了清朝的统治，建立了中华民国，但并没有改变中国任人宰割的状况。(1分)", "options": [{"label": "A", "text": "辛亥革命"}, {"label": "B", "text": "南昌起义"}, {"label": "C", "text": "广州起义"}, {"label": "D", "text": "秋收起义"}], "answer": "A辛亥革命", "answerLabel": "A"}, {"id": 24, "question": "中国人民解放军信息支援部队于()成立。(1分)", "options": [{"label": "A", "text": "19270801"}, {"label": "B", "text": "19490423"}, {"label": "C", "text": "20151231"}, {"label": "D", "text": "20240419"}], "answer": "D20240419", "answerLabel": "D"}, {"id": 25, "question": "2020年，我国应对“新冠肺炎”疫情是()。(1分)", "options": [{"label": "A", "text": "局部动员"}, {"label": "B", "text": "总动员"}], "answer": "B:总动员", "answerLabel": "B"}, {"id": 26, "question": "2014年，我国将12月13日确定为国家国家公祭日，与该公祭日直接相关的历史事件是()。(1分)", "options": [{"label": "A", "text": "九一八事变"}, {"label": "B", "text": "七七事变"}, {"label": "C", "text": "台儿庄战役"}, {"label": "D", "text": "南京大屠杀"}], "answer": "D南京大屠杀", "answerLabel": "D"}, {"id": 27, "question": "党的十九大报告指出“我们的军队是人民军队，我们的国防是()国防。我们要加强全民国防教育，巩固军政军民团结，为实现中国梦强军梦凝聚强大力量”。", "options": [{"label": "A", "text": "全民"}, {"label": "B", "text": "军队"}, {"label": "C", "text": "学校"}, {"label": "D", "text": "全社会"}], "answer": "A全民", "answerLabel": "A"}, {"id": 28, "question": "()年，中国共产党成立，中国工人阶级开始以自觉的姿态登上历史舞台。(1分)", "options": [{"label": "A", "text": "1921"}, {"label": "B", "text": "1927"}, {"label": "C", "text": "1928"}, {"label": "D", "text": "1937"}], "answer": "A 1921", "answerLabel": "A"}, {"id": 29, "question": "我国的国家性质和基本国策决定我国的国防战略是()战略。(1分)", "options": [{"label": "A", "text": "消极防御"}, {"label": "B", "text": "积极防御"}], "answer": "B积极防御", "answerLabel": "B"}, {"id": 30, "question": "1842年，由于鸦片战争失败，清政府被迫同()签订了中国近代史上第一个不平等条约，即《南京条约》。(1分)", "options": [{"label": "A", "text": "英国"}, {"label": "B", "text": "法国"}, {"label": "C", "text": "美国"}, {"label": "D", "text": "日本"}], "answer": "A英国", "answerLabel": "A"}, {"id": 31, "question": "()是新时代中国国防的根本目标。", "options": [{"label": "A", "text": "坚持永不称霸"}, {"label": "B", "text": "坚决捍卫国家主权、安全、发展利益"}, {"label": "C", "text": "坚持走中国特色强军之路"}, {"label": "D", "text": "贯彻落实新时代军事战略方针"}], "answer": "B坚决捍卫国家主权、安全、发展利益", "answerLabel": "B"}, {"id": 32, "question": "()是人民军队性质和宗旨不变的根本保证。", "options": [{"label": "A", "text": "中国共产党的绝对领导"}, {"label": "B", "text": "紧密联系群众"}, {"label": "C", "text": "党支部建在连上"}, {"label": "D", "text": "坚持政治工作民主制"}], "answer": "A.中国共产党的绝对领导", "answerLabel": "A"}, {"id": 33, "question": "国防动员的主体是()。", "options": [{"label": "A", "text": "公民"}, {"label": "B", "text": "国家"}, {"label": "C", "text": "全民"}, {"label": "D", "text": "人民"}], "answer": "B.国家", "answerLabel": "B"}, {"id": 34, "question": "国防教育的核心内容是()教育。", "options": [{"label": "A", "text": "集体主义"}, {"label": "B", "text": "爱国主义"}, {"label": "C", "text": "忧患意识"}, {"label": "D", "text": "责任意识"}], "answer": "B.爱国主义", "answerLabel": "B"}, {"id": 35, "question": "2018年4月12日，中央军委在()海域隆重举行海上阅兵。", "options": [{"label": "A", "text": "黄海"}, {"label": "B", "text": "南海"}, {"label": "C", "text": "东海"}, {"label": "D", "text": "青海"}], "answer": "", "answerLabel": ""}, {"id": 36, "question": "()为国家公祭日。", "options": [{"label": "A", "text": "每年9月3日"}, {"label": "B", "text": "每年9月30日"}, {"label": "C", "text": "每年12月13日"}, {"label": "D", "text": "每年12月30日"}], "answer": "C.每年12月13日", "answerLabel": "C"}, {"id": 37, "question": "()是实现军民融合发展的重要途经。", "options": [{"label": "A", "text": "国防教育"}, {"label": "B", "text": "国防建设"}, {"label": "C", "text": "人民防空"}], "answer": "B.国防建设", "answerLabel": "B"}, {"id": 38, "question": "中国人民的抗日战争共打了()。", "options": [{"label": "A", "text": "8年"}, {"label": "B", "text": "12年"}, {"label": "C", "text": "14年"}, {"label": "D", "text": "5年"}], "answer": "C.14年", "answerLabel": "C"}, {"id": 39, "question": "()是新时代中国国防的世界意义。", "options": [{"label": "A", "text": "坚持走中国特色强军之路"}, {"label": "B", "text": "服务构建人类命运共同体"}, {"label": "C", "text": "贯彻落实新时代军事战略方针"}, {"label": "D", "text": "坚持永不称霸"}], "answer": "B.服务构建人类命运共同体", "answerLabel": "B"}, {"id": 40, "question": "根据《国防法》规定，我国国防的对象包括()。(1分)", "options": [{"label": "A", "text": "军事斗争"}, {"label": "B", "text": "侵略武装颠覆"}, {"label": "C", "text": "恐怖袭击武装颠覆"}, {"label": "D", "text": "跨国犯罪"}], "answer": "B侵略武装颠覆", "answerLabel": "B"}, {"id": 41, "question": "为庆祝我国海军成立70周，2019年4月23日，在()举行海上阅兵活动。(1分)", "options": [{"label": "A", "text": "渤海"}, {"label": "B", "text": "南海"}, {"label": "C", "text": "沈阳"}, {"label": "D", "text": "青岛"}], "answer": "D青岛", "answerLabel": "D"}, {"id": 42, "question": "中国人民的抗日战争开始于1937年7月7日。()(1分)", "options": [{"label": "A", "text": "正确"}, {"label": "B", "text": "错误"}], "answer": "B错误", "answerLabel": "B"}, {"id": 43, "question": "我国国防教育的对象是()。(1分)", "options": [{"label": "A", "text": "学生"}, {"label": "B", "text": "高校学生"}, {"label": "C", "text": "全体公民"}, {"label": "D", "text": "符合征兵条件的人"}], "answer": "C全体公民", "answerLabel": "C"}, {"id": 44, "question": "我国《兵役法》规定:年满()周岁的男性公民，应当被征集服现役;(1分)", "options": [{"label": "A", "text": "15"}, {"label": "B", "text": "16"}, {"label": "C", "text": "17"}, {"label": "D", "text": "18"}], "answer": "D18", "answerLabel": "D"}, {"id": 45, "question": "新时代中国国防和军队建设的战略目标是，到()基本实现机械化，到()年基本实现国防和军队现代化，到()把人民军队全面建成世界一流军队。(1分)", "options": [{"label": "A", "text": "2020 2025 本世纪中叶"}, {"label": "B", "text": "2020 2035 本世纪中叶"}, {"label": "C", "text": "2020 2035 本世纪末"}, {"label": "D", "text": "2035 2055 本世纪末"}], "answer": "B2020 2035 本世纪中叶", "answerLabel": "B"}, {"id": 46, "question": "美国的国防类型是()。(1分)", "options": [{"label": "A", "text": "联盟型"}, {"label": "B", "text": "扩张型"}, {"label": "C", "text": "自卫型"}, {"label": "D", "text": "中立型"}], "answer": "B扩张型", "answerLabel": "B"}, {"id": 47, "question": "我国全民国防教育日是()。(1分)", "options": [{"label": "A", "text": "每年3月第3个星期六"}, {"label": "B", "text": "每年6月第3个星期日"}, {"label": "C", "text": "每年9月第3个星期六"}, {"label": "D", "text": "每年9月第3个星期日"}], "answer": "C每年9月第3个星期六", "answerLabel": "C"}, {"id": 48, "question": "（)是国防强大的基础。(1分)", "options": [{"label": "A", "text": "政治开明"}, {"label": "B", "text": "军事科技发展"}, {"label": "C", "text": "军队人才培养"}, {"label": "D", "text": "经济发展"}], "answer": "D经济发展", "answerLabel": "D"}, {"id": 49, "question": "中国人民解放军火箭军部队的主要装备武器是()。(1分)", "options": [{"label": "A", "text": "火炮"}, {"label": "B", "text": "坦克"}, {"label": "C", "text": "导弹"}, {"label": "D", "text": "运载火箭"}], "answer": "C导弹", "answerLabel": "C"}, {"id": 50, "question": "()在国防法规体系中占有统帅地位并起着核心作用，是其他军事立法的基本法律依据。(1分)", "options": [{"label": "A", "text": "《兵役法》"}, {"label": "B", "text": "《反分裂国家法》"}, {"label": "C", "text": "《国防教育法》"}, {"label": "D", "text": "《国防法》"}], "answer": "D《国防法》", "answerLabel": "D"}, {"id": 51, "question": "中国人民解放军陆军成立于()。", "options": [{"label": "A", "text": "19270801"}, {"label": "B", "text": "19490423"}, {"label": "C", "text": "19660701"}, {"label": "D", "text": "19491112"}], "answer": "A19270801", "answerLabel": "A"}, {"id": 52, "question": "根据《国防法》规定，我国武装力量受()领导。(1分)", "options": [{"label": "A", "text": "国家主席"}, {"label": "B", "text": "国务院"}, {"label": "C", "text": "中国共产党"}, {"label": "D", "text": "全国人大"}], "answer": "C中国共产党", "answerLabel": "C"}, {"id": 53, "question": "()是指国家根据国防需要，使社会诸领域全部或部分由平时状态转人战争状态或紧急状态所进行的活动。(1分)", "options": [{"label": "A", "text": "国防"}, {"label": "B", "text": "国防建设"}, {"label": "C", "text": "国防法规"}, {"label": "D", "text": "国防动员"}], "answer": "D国防动员", "answerLabel": "D"}, {"id": 54, "question": "在1982年中英香港问题谈判中，中国坚持()问题不能谈判。(1分)", "options": [{"label": "A", "text": "香港驻军"}, {"label": "B", "text": "司法"}, {"label": "C", "text": "政治制度"}, {"label": "D", "text": "主权"}], "answer": "D主权", "answerLabel": "D"}, {"id": 55, "question": "解放军空军的主体兵种是()。", "options": [{"label": "A", "text": "航空兵"}, {"label": "B", "text": "防空兵"}, {"label": "C", "text": "雷达兵"}, {"label": "D", "text": "通信兵"}], "answer": "A航空兵", "answerLabel": "A"}];
+
+// ─── State ────────────────────────────────────────────
+const PAGE_SIZE = 5;
+let currentMode = 'all';
+let currentPage = 0;
+let userAnswers = {}; // { questionId: 'A' }
+let isCorrect = {};   // { questionId: true/false }
+let randomOrder = [];
+let timerSeconds = 0;
+let timerInterval = null;
+let timerRunning = false;
+
+// ─── Init ─────────────────────────────────────────────
+function init() {
+  document.getElementById('totalCount').textContent = QUIZ_DATA.length;
+  
+  // Load saved state
+  try {
+    const saved = JSON.parse(localStorage.getItem('quiz_state') || '{}');
+    if (saved.answers) userAnswers = saved.answers;
+    if (saved.correct) isCorrect = saved.correct;
+    if (saved.mode) currentMode = saved.mode;
+    if (saved.timerSeconds) timerSeconds = saved.timerSeconds;
+  } catch(e) {}
+  
+  // Load theme
+  const theme = localStorage.getItem('quiz_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  updateThemeIcon(theme);
+  
+  updateTimerDisplay();
+  setMode(currentMode, true);
+  updateStats();
+  
+  // Auto-start timer if there are unanswered questions
+  const totalAnswered = Object.keys(userAnswers).length;
+  if (totalAnswered < QUIZ_DATA.length && !timerRunning) {
+    startTimer();
+  }
+}
+
+function saveState() {
+  localStorage.setItem('quiz_state', JSON.stringify({
+    answers: userAnswers,
+    correct: isCorrect,
+    mode: currentMode,
+    timerSeconds: timerSeconds,
+  }));
+}
+
+// ─── Timer ────────────────────────────────────────────
+function startTimer() {
+  if (timerRunning) return;
+  timerRunning = true;
+  timerInterval = setInterval(() => {
+    timerSeconds++;
+    updateTimerDisplay();
+    // Auto-save every 10 seconds
+    if (timerSeconds % 10 === 0) saveState();
+  }, 1000);
+}
+
+function stopTimer() {
+  timerRunning = false;
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  saveState();
+}
+
+function resetTimer() {
+  stopTimer();
+  timerSeconds = 0;
+  updateTimerDisplay();
+  saveState();
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSeconds / 60);
+  const s = timerSeconds % 60;
+  document.getElementById('statTimer').textContent = 
+    String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+// ─── Mode ─────────────────────────────────────────────
+function setMode(mode, skipSave) {
+  currentMode = mode;
+  currentPage = 0;
+  randomOrder = [];
+  
+  document.querySelectorAll('.controls .btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  
+  if (mode === 'random') {
+    randomOrder = [...Array(QUIZ_DATA.length).keys()]
+      .sort(() => Math.random() - 0.5);
+    // Reset answers for fresh random round
+    userAnswers = {};
+    isCorrect = {};
+    resetTimer();
+    startTimer();
+  } else {
+    // Start timer if not already running and there are unanswered questions
+    if (!timerRunning) startTimer();
+  }
+  
+  if (!skipSave) saveState();
+  renderQuestions();
+}
+
+// ─── Get Filtered Questions ───────────────────────────
+function getFilteredQuestions() {
+  let filtered = [];
+  
+  for (let i = 0; i < QUIZ_DATA.length; i++) {
+    const q = QUIZ_DATA[i];
+    const qid = q.id;
+    
+    switch(currentMode) {
+      case 'all':
+        filtered.push({...q, index: i});
+        break;
+      case 'unanswered':
+        if (!(qid in userAnswers)) filtered.push({...q, index: i});
+        break;
+      case 'wrong':
+        if (isCorrect[qid] === false) filtered.push({...q, index: i});
+        break;
+      case 'random':
+        filtered.push({...q, index: i});
+        break;
+    }
+  }
+  
+  if (currentMode === 'random' && randomOrder.length > 0) {
+    filtered.sort((a, b) => {
+      const ai = QUIZ_DATA.indexOf(QUIZ_DATA.find(q => q.id === a.id));
+      const bi = QUIZ_DATA.indexOf(QUIZ_DATA.find(q => q.id === b.id));
+      return randomOrder.indexOf(ai) - randomOrder.indexOf(bi);
+    });
+  }
+  
+  return filtered;
+}
+
+// ─── Render ───────────────────────────────────────────
+function renderQuestions() {
+  const container = document.getElementById('questionsContainer');
+  const filtered = getFilteredQuestions();
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
+        </svg>
+        <h3>${currentMode === 'wrong' ? '没有错题，太棒了！' : currentMode === 'unanswered' ? '所有题目已完成！' : '暂无题目'}</h3>
+        <p>${currentMode === 'wrong' ? '继续保持 💪' : '换个模式看看吧'}</p>
+      </div>`;
+    document.getElementById('navButtons').style.display = 'none';
+    updateProgress(filtered);
+    return;
+  }
+  
+  const start = currentPage * PAGE_SIZE;
+  const pageQuestions = filtered.slice(start, start + PAGE_SIZE);
+  
+  container.innerHTML = pageQuestions.map((q, idx) => {
+    const qid = q.id;
+    const answered = qid in userAnswers;
+    const correct = isCorrect[qid];
+    const selectedLabel = userAnswers[qid];
+    const answerLabel = q.answerLabel;
+    
+    let cardClass = '';
+    if (answered && correct) cardClass = 'answered-correct';
+    else if (answered && !correct) cardClass = 'answered-wrong';
+    
+    let numClass = 'unanswered';
+    if (answered && correct) numClass = 'correct-num';
+    else if (answered && !correct) numClass = 'wrong-num';
+    
+    const optionsHtml = q.options.map(opt => {
+      let optClass = '';
+      if (answered) {
+        if (opt.label === answerLabel) optClass = 'correct-answer';
+        else if (opt.label === selectedLabel && selectedLabel !== answerLabel) optClass = 'wrong-answer';
+      } else if (opt.label === selectedLabel) {
+        optClass = 'selected';
+      }
+      return `
+        <button class="option-btn ${optClass} ${answered ? 'disabled' : ''}"
+                onclick="${answered ? '' : `selectAnswer(${qid}, '${opt.label}')`}">
+          <span class="option-label">${opt.label}</span>
+          <span>${opt.text}</span>
+        </button>`;
+    }).join('');
+    
+    let feedbackHtml = '';
+    if (answered) {
+      const fbClass = correct ? 'correct' : 'wrong';
+      const fbText = correct 
+        ? `✅ 回答正确！`
+        : `❌ 回答错误，正确答案是 <strong>${answerLabel}. ${q.options.find(o=>o.label===answerLabel)?.text || ''}</strong>`;
+      feedbackHtml = `<div class="feedback ${fbClass} show">${fbText}</div>`;
+    }
+    
+    return `
+      <div class="question-card ${cardClass}">
+        <div class="question-number ${numClass}">${qid}</div>
+        <div class="question-text">${q.question}</div>
+        <div class="options-list">${optionsHtml}</div>
+        ${feedbackHtml}
+      </div>`;
+  }).join('');
+  
+  // Pagination
+  const navBtns = document.getElementById('navButtons');
+  if (totalPages > 1) {
+    navBtns.style.display = 'flex';
+    document.getElementById('prevBtn').disabled = currentPage === 0;
+    document.getElementById('nextBtn').disabled = currentPage >= totalPages - 1;
+    document.getElementById('pageInfo').textContent = `第 ${currentPage + 1}/${totalPages} 页`;
+  } else {
+    navBtns.style.display = 'none';
+  }
+  
+  updateProgress(filtered);
+}
+
+function updateProgress(filtered) {
+  if (!filtered) filtered = getFilteredQuestions();
+  const total = QUIZ_DATA.length;
+  const answered = Object.keys(userAnswers).length;
+  const correct = Object.values(isCorrect).filter(v => v === true).length;
+  const wrong = Object.values(isCorrect).filter(v => v === false).length;
+  
+  document.getElementById('statAnswered').textContent = answered;
+  document.getElementById('statCorrect').textContent = correct;
+  document.getElementById('statWrong').textContent = wrong;
+  document.getElementById('statAccuracy').textContent = answered > 0 ? Math.round(correct / answered * 100) + '%' : '-';
+  
+  // Overall progress
+  const pct = total > 0 ? Math.round(answered / total * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `进度 ${answered}/${total}`;
+  document.getElementById('progressPercent').textContent = pct + '%';
+}
+
+// ─── Answer Selection ─────────────────────────────────
+function selectAnswer(qid, label) {
+  const q = QUIZ_DATA.find(q => q.id === qid);
+  if (!q) return;
+  
+  userAnswers[qid] = label;
+  isCorrect[qid] = (label === q.answerLabel);
+  
+  saveState();
+  
+  // Check if all questions are answered in random mode
+  if (currentMode === 'random') {
+    const totalAnswered = Object.keys(userAnswers).length;
+    if (totalAnswered >= QUIZ_DATA.length) {
+      // All done! Show summary, then reshuffle
+      stopTimer();
+      const m = Math.floor(timerSeconds / 60);
+      const s = timerSeconds % 60;
+      const correct = Object.values(isCorrect).filter(v => v === true).length;
+      const timeStr = m > 0 ? `${m}分${s}秒` : `${s}秒`;
+      const msg = `🎉 本轮完成！\n正确：${correct}/${QUIZ_DATA.length}\n正确率：${Math.round(correct/QUIZ_DATA.length*100)}%\n用时：${timeStr}\n\n即将开始新一轮随机刷题…`;
+      alert(msg);
+      
+      // Reshuffle and restart
+      randomOrder = [...Array(QUIZ_DATA.length).keys()]
+        .sort(() => Math.random() - 0.5);
+      userAnswers = {};
+      isCorrect = {};
+      currentPage = 0;
+      resetTimer();
+      startTimer();
+      saveState();
+      renderQuestions();
+      window.scrollTo(0, 0);
+      return;
+    }
+  }
+  
+  renderQuestions();
+  
+  // Auto-advance in random mode
+  if (currentMode === 'random') {
+    const filtered = getFilteredQuestions();
+    const currentIdx = filtered.findIndex(q => q.id === qid);
+    if (currentIdx >= 0 && currentIdx % PAGE_SIZE === PAGE_SIZE - 1 && currentPage < Math.ceil(filtered.length / PAGE_SIZE) - 1) {
+      setTimeout(() => nextPage(), 600);
+    }
+  }
+}
+
+// ─── Pagination ───────────────────────────────────────
+function prevPage() {
+  if (currentPage > 0) {
+    currentPage--;
+    renderQuestions();
+    window.scrollTo(0, 0);
+  }
+}
+
+function nextPage() {
+  const filtered = getFilteredQuestions();
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  if (currentPage < totalPages - 1) {
+    currentPage++;
+    renderQuestions();
+    window.scrollTo(0, 0);
+  }
+}
+
+// ─── Theme Toggle ─────────────────────────────────────
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('quiz_theme', next);
+  updateThemeIcon(next);
+});
+
+function updateThemeIcon(theme) {
+  const icon = document.getElementById('themeIcon');
+  if (theme === 'dark') {
+    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  } else {
+    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  }
+}
+
+// ─── Start ────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
