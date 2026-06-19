@@ -1,1874 +1,401 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>国防教育知识刷题</title>
-<style>
-:root {
-  --primary: #4f46e5;
-  --primary-light: #6366f1;
-  --success: #10b981;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --bg: #f8fafc;
-  --card-bg: #ffffff;
-  --text: #1e293b;
-  --text-secondary: #64748b;
-  --border: #e2e8f0;
-  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
-  --shadow-lg: 0 10px 25px rgba(0,0,0,.1);
-  --radius: 12px;
-  --transition: 0.2s cubic-bezier(.4,0,.2,1);
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>访问验证</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-[data-theme="dark"] {
-  --bg: #0f172a;
-  --card-bg: #1e293b;
-  --text: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --border: #334155;
-  --shadow: 0 1px 3px rgba(0,0,0,.3);
-  --shadow-lg: 0 10px 25px rgba(0,0,0,.4);
-}
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #0c1929 0%, #1a3a5c 50%, #0c1929 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
 
-* { margin:0; padding:0; box-sizing:border-box; }
+    /* 背景粒子动画 */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  line-height: 1.6;
-}
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      animation: floatUp linear infinite;
+    }
 
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px 16px 40px;
-}
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+      }
+    }
 
-/* Header */
-.header {
-  text-align: center;
-  padding: 32px 0 20px;
-}
+    /* 主容器 */
+    .lock-container {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 48px 40px;
+      width: 420px;
+      max-width: 90vw;
+      text-align: center;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+    }
 
-.header h1 {
-  font-size: 28px;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--primary), #8b5cf6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 4px;
-}
+    /* 锁图标 */
+    .lock-icon {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 24px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-.header .subtitle {
-  color: var(--text-secondary);
-  font-size: 14px;
-}
+    .lock-icon svg {
+      width: 36px;
+      height: 36px;
+      stroke: #60a5fa;
+    }
 
-/* Stats Bar */
-.stats-bar {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 20px;
-}
+    /* 标题 */
+    .lock-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
 
-.stat-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px 20px;
-  text-align: center;
-  box-shadow: var(--shadow);
-  min-width: 80px;
-}
+    .lock-subtitle {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 32px;
+    }
 
-.stat-card .stat-value {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--primary);
-}
+    /* 输入框 */
+    .input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
 
-.stat-card .stat-label {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
+    .input-group input {
+      width: 100%;
+      padding: 14px 48px 14px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      color: #e2e8f0;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+      letter-spacing: 2px;
+    }
 
-.stat-card.correct .stat-value { color: var(--success); }
-.stat-card.wrong .stat-value { color: var(--danger); }
-.stat-card.total .stat-value { color: var(--text); }
-.stat-card.timer .stat-value { color: #f59e0b; font-variant-numeric: tabular-nums; font-family: "SF Mono", "Consolas", "Courier New", monospace; font-size: 20px; }
+    .input-group input:focus {
+      border-color: #3b82f6;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    }
 
-/* Controls */
-.controls {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 24px;
-}
+    .input-group input::placeholder {
+      color: #64748b;
+      letter-spacing: 1px;
+    }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  border: 1px solid var(--border);
-  background: var(--card-bg);
-  color: var(--text);
-  cursor: pointer;
-  transition: var(--transition);
-  white-space: nowrap;
-}
+    .toggle-password {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      color: #64748b;
+      transition: color 0.2s;
+    }
 
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow);
-}
+    .toggle-password:hover {
+      color: #94a3b8;
+    }
 
-.btn.active {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-}
+    .toggle-password svg {
+      width: 20px;
+      height: 20px;
+    }
 
-.btn.primary {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-}
+    /* 按钮 */
+    .unlock-btn {
+      width: 100%;
+      padding: 14px 24px;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+    }
 
-.btn.primary:hover {
-  background: var(--primary-light);
-}
+    .unlock-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    }
 
-.btn svg {
-  width: 16px;
-  height: 16px;
-}
+    .unlock-btn:active {
+      transform: translateY(0);
+    }
 
-/* Progress */
-.progress-container {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 20px;
-  box-shadow: var(--shadow);
-}
+    .unlock-btn.loading {
+      pointer-events: none;
+      opacity: 0.8;
+    }
 
-.progress-bar {
-  height: 8px;
-  background: var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
+    .unlock-btn .btn-text {
+      transition: opacity 0.2s;
+    }
 
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), #8b5cf6);
-  border-radius: 4px;
-  transition: width 0.4s ease;
-}
+    .unlock-btn .btn-spinner {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
 
-.progress-text {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  color: var(--text-secondary);
-}
+    .unlock-btn.loading .btn-text { opacity: 0; }
+    .unlock-btn.loading .btn-spinner { display: block; }
 
-/* Question Card */
-.question-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-  transition: var(--transition);
-  position: relative;
-}
+    @keyframes spin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
 
-.question-card.answered-correct {
-  border-color: var(--success);
-  background: linear-gradient(135deg, rgba(16,185,129,.05), var(--card-bg));
-}
+    /* 错误提示 */
+    .error-msg {
+      color: #f87171;
+      font-size: 13px;
+      margin-top: -8px;
+      margin-bottom: 16px;
+      min-height: 20px;
+      transition: all 0.3s;
+      opacity: 0;
+      transform: translateY(-4px);
+    }
 
-.question-card.answered-wrong {
-  border-color: var(--danger);
-  background: linear-gradient(135deg, rgba(239,68,68,.05), var(--card-bg));
-}
+    .error-msg.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-.question-number {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--primary);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
+    /* 底部提示 */
+    .lock-footer {
+      margin-top: 24px;
+      font-size: 12px;
+      color: #475569;
+      letter-spacing: 0.5px;
+    }
 
-.question-number.correct-num { background: var(--success); }
-.question-number.wrong-num { background: var(--danger); }
-.question-number.unanswered { background: var(--text-secondary); }
-
-.question-text {
-  font-size: 16px;
-  font-weight: 500;
-  margin-bottom: 16px;
-  line-height: 1.7;
-}
-
-.options-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.option-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border: 2px solid var(--border);
-  border-radius: 10px;
-  background: var(--card-bg);
-  color: var(--text);
-  cursor: pointer;
-  transition: var(--transition);
-  text-align: left;
-  font-size: 14px;
-  font-family: inherit;
-  width: 100%;
-}
-
-.option-btn:hover:not(.disabled) {
-  border-color: var(--primary);
-  background: rgba(79,70,229,.05);
-}
-
-.option-btn .option-label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--border);
-  color: var(--text-secondary);
-  font-weight: 700;
-  font-size: 13px;
-  flex-shrink: 0;
-  transition: var(--transition);
-}
-
-.option-btn:hover:not(.disabled) .option-label {
-  background: var(--primary);
-  color: #fff;
-}
-
-.option-btn.selected {
-  border-color: var(--primary);
-  background: rgba(79,70,229,.08);
-}
-
-.option-btn.selected .option-label {
-  background: var(--primary);
-  color: #fff;
-}
-
-.option-btn.correct-answer {
-  border-color: var(--success) !important;
-  background: rgba(16,185,129,.1) !important;
-}
-
-.option-btn.correct-answer .option-label {
-  background: var(--success) !important;
-  color: #fff !important;
-}
-
-.option-btn.wrong-answer {
-  border-color: var(--danger) !important;
-  background: rgba(239,68,68,.1) !important;
-}
-
-.option-btn.wrong-answer .option-label {
-  background: var(--danger) !important;
-  color: #fff !important;
-}
-
-.option-btn.disabled {
-  cursor: default;
-  opacity: 0.7;
-}
-
-.option-btn.disabled:hover {
-  border-color: var(--border);
-  background: var(--card-bg);
-}
-
-.option-btn.disabled:hover .option-label {
-  background: var(--border);
-  color: var(--text-secondary);
-}
-
-.feedback {
-  margin-top: 12px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  display: none;
-}
-
-.feedback.show { display: block; }
-.feedback.correct { background: rgba(16,185,129,.1); color: var(--success); }
-.feedback.wrong { background: rgba(239,68,68,.1); color: var(--danger); }
-
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-secondary);
-}
-
-.empty-state svg {
-  width: 64px;
-  height: 64px;
-  margin-bottom: 16px;
-  opacity: 0.4;
-}
-
-.empty-state h3 {
-  font-size: 18px;
-  margin-bottom: 8px;
-  color: var(--text);
-}
-
-/* Pagination / Navigation */
-.nav-buttons {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-/* Filter tabs */
-.filter-tabs {
-  display: flex;
-  gap: 4px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 4px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-}
-
-.filter-tab {
-  flex: 1;
-  padding: 8px 12px;
-  border-radius: 7px;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  transition: var(--transition);
-  font-family: inherit;
-}
-
-.filter-tab.active {
-  background: var(--primary);
-  color: #fff;
-}
-
-/* Theme Toggle */
-.theme-toggle {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--card-bg);
-  color: var(--text);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow);
-  transition: var(--transition);
-  z-index: 100;
-}
-
-.theme-toggle:hover {
-  transform: scale(1.1);
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  .header h1 { font-size: 22px; }
-  .question-text { font-size: 15px; }
-  .stats-bar { gap: 6px; }
-  .stat-card { padding: 8px 14px; min-width: 60px; }
-  .stat-card .stat-value { font-size: 20px; }
-}
-</style>
+    /* 响应式 */
+    @media (max-width: 480px) {
+      .lock-container {
+        padding: 36px 24px;
+        border-radius: 20px;
+      }
+      .lock-title {
+        font-size: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-<button class="theme-toggle" id="themeToggle" title="切换主题">
-  <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-  </svg>
-</button>
 
-<div class="container">
-  <div class="header">
-    <h1>国防教育知识刷题</h1>
-    <p class="subtitle">共 <span id="totalCount">0</span> 题 · 助力国防教育学习</p>
-  </div>
+  <!-- 背景粒子 -->
+  <div class="particles" id="particles"></div>
 
-  <div class="stats-bar">
-    <div class="stat-card total">
-      <div class="stat-value" id="statAnswered">0</div>
-      <div class="stat-label">已答</div>
+  <!-- 密码锁 -->
+  <div class="lock-container">
+    <div class="lock-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        <circle cx="12" cy="16" r="1"/>
+      </svg>
     </div>
-    <div class="stat-card correct">
-      <div class="stat-value" id="statCorrect">0</div>
-      <div class="stat-label">正确</div>
-    </div>
-    <div class="stat-card wrong">
-      <div class="stat-value" id="statWrong">0</div>
-      <div class="stat-label">错误</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="statAccuracy">-</div>
-      <div class="stat-label">正确率</div>
-    </div>
-    <div class="stat-card timer">
-      <div class="stat-value" id="statTimer">00:00</div>
-      <div class="stat-label">用时</div>
-    </div>
-  </div>
 
-  <div class="controls">
-    <button class="btn active" data-mode="all" onclick="setMode('all')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-      全部题目
-    </button>
-    <button class="btn" data-mode="unanswered" onclick="setMode('unanswered')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      未答题
-    </button>
-    <button class="btn" data-mode="wrong" onclick="setMode('wrong')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-      错题集
-    </button>
-    <button class="btn" data-mode="random" onclick="setMode('random')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
-      随机刷题
-    </button>
-  </div>
+    <h1 class="lock-title">需要密码才能访问</h1>
+    <p class="lock-subtitle">请输入密码以查看页面内容</p>
 
-  <div class="progress-container">
-    <div class="progress-bar">
-      <div class="progress-fill" id="progressFill" style="width:0%"></div>
-    </div>
-    <div class="progress-text">
-      <span id="progressLabel">进度 0/0</span>
-      <span id="progressPercent">0%</span>
-    </div>
-  </div>
-
-  <div id="questionsContainer">
-    <!-- Questions render here -->
-  </div>
-
-  <div class="nav-buttons" id="navButtons" style="display:none;">
-    <button class="btn" id="prevBtn" onclick="prevPage()" disabled>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-      上一页
-    </button>
-    <span style="line-height:40px;color:var(--text-secondary);font-size:14px;" id="pageInfo">第 1 页</span>
-    <button class="btn" id="nextBtn" onclick="nextPage()">
-      下一页
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
-  </div>
-</div>
-
-<script>
-// ─── Quiz Data ────────────────────────────────────────
-const QUIZ_DATA = [
-  {
-    id: 1,
-    question: '( )是第二次世界大战中苏联卫国战争的转折点，也是第二次世界大战的转折点。',
-    options: [{ label: 'A', text: '莫斯科会战' }, { label: 'B', text: '列宁格勒会战' }, { label: 'C', text: '斯大林格勒会战' }, { label: 'D', text: '柏林战役' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 2,
-    question: '全面抗战爆发后，八路军打的第一个大胜仗，打破了日军不可战胜的神话是（ ）。',
-    options: [{ label: 'A', text: '平型关战役' }, { label: 'B', text: '台儿庄战役' }, { label: 'C', text: '武汉会战' }, { label: 'D', text: '长沙大捷' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 3,
-    question: '1919年5月4日，五四爱国运动爆发的直接导火索是（ ）。',
-    options: [{ label: 'A', text: '巴黎和会上中国外交的失败' }, { label: 'B', text: '日本制造“济南惨案”' }, { label: 'C', text: '日本出兵占领青岛' }, { label: 'D', text: '《凡尔赛和约》的签订' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 4,
-    question: '现在世界上能够全球作战、全球到达的国家军队是（ ）。',
-    options: [{ label: 'A', text: '解放军' }, { label: 'B', text: '俄军' }, { label: 'C', text: '日军' }, { label: 'D', text: '美军' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 5,
-    question: '在信息化战争中，( )成为衡量双方力量优劣的首要标志，成为整体作战和高效作战的前提和制胜基础。',
-    options: [{ label: 'A', text: '火力优势' }, { label: 'B', text: '兵力优势' }, { label: 'C', text: '信息优势' }, { label: 'D', text: '机动优势' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 6,
-    question: '（ ）是冷战结束后规模最大、参战国最多、现代化程度最高的一场局部战争。',
-    options: [{ label: 'A', text: '海湾战争' }, { label: 'B', text: '科索沃战争' }, { label: 'C', text: '阿富汗战争' }, { label: 'D', text: '伊拉克战争' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 7,
-    question: '人类历经四次军事变革，现在正在进行的是（ ）战争形态。',
-    options: [{ label: 'A', text: '冷兵器' }, { label: 'B', text: '热兵器' }, { label: 'C', text: '机械化' }, { label: 'D', text: '信息化' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 8,
-    question: '新中国成立后，我们同外敌打了四仗，其中最艰难的一仗是（ ）。',
-    options: [{ label: 'A', text: '对印自卫反击战' }, { label: 'B', text: '珍宝岛自卫还击作战' }, { label: 'C', text: '抗美援朝' }, { label: 'D', text: '对越自卫还击作战' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 9,
-    question: '首次提出信息化战争概念的中国人是（ ）。',
-    options: [{ label: 'A', text: '毛泽东' }, { label: 'B', text: '钱学森' }, { label: 'C', text: '邓小平' }, { label: 'D', text: '周恩来' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 10,
-    question: '科索沃战争的以大规模的（ ）为最主要的作战方式。',
-    options: [{ label: 'A', text: '地面攻击' }, { label: 'B', text: '空袭' }, { label: 'C', text: '导弹攻击' }, { label: 'D', text: '坦克战' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 11,
-    question: '（ ）美国在日本投下了两颗原子弹，宣告核时代的到来。',
-    options: [{ label: 'A', text: '194408' }, { label: 'B', text: '194409' }, { label: 'C', text: '194508' }, { label: 'D', text: '194509' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 12,
-    question: '( )不是信息化战争的作战样式。',
-    options: [{ label: 'A', text: '网络战' }, { label: 'B', text: '太空战' }, { label: 'C', text: '精确战' }, { label: 'D', text: '狼群战' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 13,
-    question: '伊拉克战争爆发于( )年。',
-    options: [{ label: 'A', text: '2011' }, { label: 'B', text: '1991' }, { label: 'C', text: '2001' }, { label: 'D', text: '2003' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 14,
-    question: '新军事革命就是信息化军事革命，是世界军事由（ ）的机械化战争形态向信息时代的信息化军事形态的全面转型。',
-    options: [{ label: 'A', text: '农业时代' }, { label: 'B', text: '工业时代' }, { label: 'C', text: '智能时代' }, { label: 'D', text: '信息时代' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 15,
-    question: '信息化战争是人类( )的产物。',
-    options: [{ label: 'A', text: '农业社会' }, { label: 'B', text: '工业社会' }, { label: 'C', text: '信息社会' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 16,
-    question: '1973年10月6日，埃及和叙利亚同时向以色列开火，第( )中东战争爆发。',
-    options: [{ label: 'A', text: '一' }, { label: 'B', text: '二' }, { label: 'C', text: '三' }, { label: 'D', text: '四' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 17,
-    question: '越南战争爆发于( )年。',
-    options: [{ label: 'A', text: '1955' }, { label: 'B', text: '1973' }, { label: 'C', text: '1975' }, { label: 'D', text: '1972' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 18,
-    question: '从战争形态来看，（ ）是机械化战争向信息化战争形态转变的里程碑。',
-    options: [{ label: 'A', text: '伊拉克战争' }, { label: 'B', text: '科索沃战争' }, { label: 'C', text: '阿富汗战争' }, { label: 'D', text: '海湾战争' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 19,
-    question: '第一次世界大战是（ ）年爆发的。',
-    options: [{ label: 'A', text: '1914' }, { label: 'B', text: '1915' }, { label: 'C', text: '1939' }, { label: 'D', text: '1945' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 20,
-    question: '机械化战争是发生在（ ）的战争。',
-    options: [{ label: 'A', text: '农业时代' }, { label: 'B', text: '工业时代' }, { label: 'C', text: '信息时代' }, { label: 'D', text: '现代' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 21,
-    question: '信息化战争中的主导资源是（ ）。',
-    options: [{ label: 'A', text: '物质' }, { label: 'B', text: '能量' }, { label: 'C', text: '信息' }, { label: 'D', text: '知识' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 22,
-    question: '在信息化战争中，敌对双方间的信息攻击和信息防护，实质上是争夺“（ ）”的作战行动。',
-    options: [{ label: 'A', text: '制天权' }, { label: 'B', text: '制空权' }, { label: 'C', text: '制海权' }, { label: 'D', text: '制信息权' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 23,
-    question: '（ ）中，开创了“爱国者”导弹拦截“飞毛腿”导弹的先例。',
-    options: [{ label: 'A', text: '朝鲜战争' }, { label: 'B', text: '越南战争' }, { label: 'C', text: '马岛战争' }, { label: 'D', text: '海湾战争' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 24,
-    question: '（ ）年，中国在中苏边境的中国领土珍宝岛进行自卫反战。',
-    options: [{ label: 'A', text: '1950' }, { label: 'B', text: '1953' }, { label: 'C', text: '1969' }, { label: 'D', text: '1979' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 25,
-    question: '1939年9月1日，德国发动大批飞机轰炸（ ）重要军事目标，从此第二次世界大战全面爆发。',
-    options: [{ label: 'A', text: '苏联' }, { label: 'B', text: '波兰' }, { label: 'C', text: '法国' }, { label: 'D', text: '英国' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 26,
-    question: '1999年以美国为首的北约发动的（ ）中袭击了我国驻南斯拉夫大使馆。',
-    options: [{ label: 'A', text: '海湾战争' }, { label: 'B', text: '科索沃战争' }, { label: 'C', text: '阿富汗战争' }, { label: 'D', text: '伊拉克战争' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 27,
-    question: '第二次世界大战中（ ）对日本发动核战争。',
-    options: [{ label: 'A', text: '前苏联' }, { label: 'B', text: '美国' }, { label: 'C', text: '英国' }, { label: 'D', text: '中国' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 28,
-    question: '英阿马岛战争爆发于（ ）年。',
-    options: [{ label: 'A', text: '1979' }, { label: 'B', text: '1982' }, { label: 'C', text: '1999' }, { label: 'D', text: '2003' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 29,
-    question: '战争形态中更加注重实施“软”打击的是（ ）。',
-    options: [{ label: 'A', text: '冷兵器战争' }, { label: 'B', text: '热兵器战争' }, { label: 'C', text: '机械化战争' }, { label: 'D', text: '信息化战争' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 30,
-    question: '我国当今军事斗争准备基点是打赢信息化（ ）。',
-    options: [{ label: 'A', text: '世界大战' }, { label: 'B', text: '全面战争' }, { label: 'C', text: '局部战争' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 31,
-    question: '1999年3月27日，F-117型隐身战机在()战争中首次被击落。',
-    options: [{ label: 'A', text: '海湾' }, { label: 'B', text: '科索沃' }, { label: 'C', text: '阿富汗' }, { label: 'D', text: '空袭利比亚' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 32,
-    question: '（ ）是我国最高军事学府。',
-    options: [{ label: 'A', text: '国防大学' }, { label: 'B', text: '国防科技大学' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 33,
-    question: '1940年8月20日至翌年1月24日，八路军总部在华北发动了一次大规模的对日军的进攻，陆续参战的部队达到105个团20余万人，史称（）。',
-    options: [{ label: 'A', text: '武汉会战' }, { label: 'B', text: '百团大战' }, { label: 'C', text: '淞沪会战' }, { label: 'D', text: '兰封会战' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 34,
-    question: '日本的兵力部署重点加强西南方向，主要针对（ ）。',
-    options: [{ label: 'A', text: '印度' }, { label: 'B', text: '俄罗斯' }, { label: 'C', text: '美国' }, { label: 'D', text: '中国' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 35,
-    question: '我国坚持（ ）。',
-    options: [{ label: 'A', text: '总体国防安全观' }, { label: 'B', text: '全民安全观' }, { label: 'C', text: '总体国家安全观' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 36,
-    question: '( )是国家生存和发展的最基本条件。',
-    options: [{ label: 'A', text: '文化安全' }, { label: 'B', text: '生态安全' }, { label: 'C', text: '国土安全' }, { label: 'D', text: '网络安全' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 37,
-    question: '2013年11月23日，中国国防部宣布划设（ ）防空识别区。',
-    options: [{ label: 'A', text: '东海' }, { label: 'B', text: '南海' }, { label: 'C', text: '黄海' }, { label: 'D', text: '渤海' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 38,
-    question: '我国的总体国家安全观以（ ）为基础。',
-    options: [{ label: 'A', text: '社会安全' }, { label: 'B', text: '政治安全' }, { label: 'C', text: '军事安全' }, { label: 'D', text: '经济安全' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 39,
-    question: '（ ）是人类社会的公敌，是国际社会共同打击的对象。',
-    options: [{ label: 'A', text: '霸权主义' }, { label: 'B', text: '恐怖主义' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 40,
-    question: '我国的总体国家安全观以（ ）为依托。',
-    options: [{ label: 'A', text: '促进国际安全' }, { label: 'B', text: '人民安全' }, { label: 'C', text: '军事安全' }, { label: 'D', text: '经济安全' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 41,
-    question: '美国将俄罗斯定义为“大国竞争”主要对手，2019年2月宣布退出（ ）。',
-    options: [{ label: 'A', text: '伊核协议' }, { label: 'B', text: '《中导条约》' }, { label: 'C', text: '《巴黎协定》' }, { label: 'D', text: '跨太平洋伙伴关系协定' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 42,
-    question: '（ ）是世界上国家间面积最大的陆地争议区。',
-    options: [{ label: 'A', text: '中俄边界争议面积' }, { label: 'B', text: '中越边界争议面积' }, { label: 'C', text: '中印边界争议面积' }, { label: 'D', text: '中缅边界争议面积' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 43,
-    question: '南海问题中最复杂的是（ ）群岛。',
-    options: [{ label: 'A', text: '东沙' }, { label: 'B', text: '西沙' }, { label: 'C', text: '中沙' }, { label: 'D', text: '南沙' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 44,
-    question: '侵占我国南沙群岛岛礁最早的国家是（ ）。',
-    options: [{ label: 'A', text: '越南' }, { label: 'B', text: '马来西亚' }, { label: 'C', text: '文莱' }, { label: 'D', text: '菲律宾' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 45,
-    question: '国家安全工作要坚持总体国家安全观，以（ ）为根本。',
-    options: [{ label: 'A', text: '人民安全' }, { label: 'B', text: '经济安全' }, { label: 'C', text: '社会安全' }, { label: 'D', text: '政治安全' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 46,
-    question: '（ ）事关国家主权和领土完整，是中国国家核心利益所在。',
-    options: [{ label: 'A', text: '台湾问题' }, { label: 'B', text: '朝鲜半岛核问题' }, { label: 'C', text: '伊核问题' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 47,
-    question: '我国在南海争端问题的基本立场是“主权属我，搁置争议，（ ）”。',
-    options: [{ label: 'A', text: '共同管理' }, { label: 'B', text: '共同开发' }, { label: 'C', text: '共同建设' }, { label: 'D', text: '共同拥有' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 48,
-    question: '依据《联合国海洋法公约》，中国主张应该拥有的管辖海洋面积约（ ）万平方公里，我们称作海洋国土。',
-    options: [{ label: 'A', text: '100' }, { label: 'B', text: '600' }, { label: 'C', text: '300' }, { label: 'D', text: '800' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 49,
-    question: '我国陆地邻国，其中与（ ）未划定陆地边界。',
-    options: [{ label: 'A', text: '尼泊尔' }, { label: 'B', text: '阿富汗' }, { label: 'C', text: '俄罗斯' }, { label: 'D', text: '印度' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 50,
-    question: '“天下虽安，忘战必危”出自( )。',
-    options: [{ label: 'A', text: '《易·系辞下》' }, { label: 'B', text: '《司马法·仁本》' }, { label: 'C', text: '《国策·齐策六》' }, { label: 'D', text: '《孙子兵法》' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 51,
-    question: '我国共（ ）个海上直接相邻国家。',
-    options: [{ label: 'A', text: '6' }, { label: 'B', text: '7' }, { label: 'C', text: '8' }, { label: 'D', text: '9' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 52,
-    question: '侵占我国南海岛礁最多的国家是（ ）。',
-    options: [{ label: 'A', text: '菲律宾' }, { label: 'B', text: '越南' }, { label: 'C', text: '马来西亚' }, { label: 'D', text: '文莱' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 53,
-    question: '当普通人在面对暴力恐怖袭击时，应该（ ）。',
-    options: [{ label: 'A', text: '迅速撤走、远离现场' }, { label: 'B', text: '向恐怖分子下跪求饶' }, { label: 'C', text: '拍照发微博' }, { label: 'D', text: '坐以待毙' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 54,
-    question: '不被国际社会承认拥有核武器的国家为（ ）。',
-    options: [{ label: 'A', text: '中国' }, { label: 'B', text: '俄罗斯' }, { label: 'C', text: '美国' }, { label: 'D', text: '朝鲜' }, { label: 'E', text: '英国' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 55,
-    question: '美国在新版《国家安全战略报告》中明确将（ ）定位为“战略上的竞争对手”。',
-    options: [{ label: 'A', text: '俄罗斯' }, { label: 'B', text: '中国' }, { label: 'C', text: '朝鲜' }, { label: 'D', text: '伊朗' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 56,
-    question: '从目前世界形势看，（ ）趋势不可逆转，向新的广度和深度继续扩展。',
-    options: [{ label: 'A', text: '两极' }, { label: 'B', text: '多极' }, { label: 'C', text: '一超多极' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 57,
-    question: '2015年7月，全国人大修订颁布（ ），将总体国家安全观的原则要求以法律的形式加以明确和固定下来。',
-    options: [{ label: 'A', text: '《国家网络安全法》' }, { label: 'B', text: '《国家安全法》' }, { label: 'C', text: '《反间谍法》' }, { label: 'D', text: '《反分裂国家法》' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 58,
-    question: '1989年11月9日，“柏林墙倒塌”事件发生后，加速了（ ）的进程。',
-    options: [{ label: 'A', text: '第二次世界大战' }, { label: 'B', text: '多极化格局' }, { label: 'C', text: '东欧剧变' }, { label: 'D', text: '苏联解体' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 59,
-    question: '我国的总体国家安全观以（ ）为宗旨。',
-    options: [{ label: 'A', text: '社会安全' }, { label: 'B', text: '人民安全' }, { label: 'C', text: '军事安全' }, { label: 'D', text: '经济安全' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 60,
-    question: '我国的总体国家安全观以（ ）为根本。',
-    options: [{ label: 'A', text: '社会安全' }, { label: 'B', text: '政治安全' }, { label: 'C', text: '军事安全' }, { label: 'D', text: '经济安全' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 61,
-    question: '我国与印度边境有（ ）万平方公里的争议地区。',
-    options: [{ label: 'A', text: '9' }, { label: 'B', text: '10' }, { label: 'C', text: '12.5' }, { label: 'D', text: '13.5' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 62,
-    question: '主权国家中，海上与我国相邻的是（ ）。',
-    options: [{ label: 'A', text: '蒙古' }, { label: 'B', text: '日本' }, { label: 'C', text: '老挝' }, { label: 'D', text: '印度' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 63,
-    question: '我国的陆地面积是（ ）万平方千米。',
-    options: [{ label: 'A', text: '960' }, { label: 'B', text: '300' }, { label: 'C', text: '1160' }, { label: 'D', text: '1260' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 64,
-    question: '（ ）在整个国家安全体系中发挥至关重要的支柱和保障作用，关系到国家的生死存亡和长治久安。',
-    options: [{ label: 'A', text: '社会安全' }, { label: 'B', text: '军事安全' }, { label: 'C', text: '资源安全' }, { label: 'D', text: '科技安全' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 65,
-    question: '（ ）在军事上是一支制衡美国的强大力量。',
-    options: [{ label: 'A', text: '俄罗斯' }, { label: 'B', text: '日本' }, { label: 'C', text: '德国' }, { label: 'D', text: '法国' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 66,
-    question: '我国共（ ）个陆地接壤邻国。',
-    options: [{ label: 'A', text: '10' }, { label: 'B', text: '12' }, { label: 'C', text: '14' }, { label: 'D', text: '16' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 67,
-    question: '2018年5月8日，美国威胁伊朗宣布退出（ ）。',
-    options: [{ label: 'A', text: '《巴黎协定》' }, { label: 'B', text: '《中导条约》' }, { label: 'C', text: '伊核协议' }, { label: 'D', text: '跨太平洋伙伴关系协定' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 68,
-    question: '我国海岸线漫长，不算岛屿海岸线，仅大陆海岸线就有（）万公里。',
-    options: [{ label: 'A', text: '1.2' }, { label: 'B', text: '1.8' }, { label: 'C', text: '2.2' }, { label: 'D', text: '3.2' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 69,
-    question: '印度在兵力部署上，凸显“北防”战略方针，主要防范（ ）。',
-    options: [{ label: 'A', text: '俄罗斯' }, { label: 'B', text: '巴基斯坦' }, { label: 'C', text: '中国' }, { label: 'D', text: '不丹' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 70,
-    question: '中国陆地边界线长约（）万千米。',
-    options: [{ label: 'A', text: '1.2' }, { label: 'B', text: '1.8' }, { label: 'C', text: '2.2' }, { label: 'D', text: '3.2' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 71,
-    question: '根据宪法、国家安全法的规定，负责宣布进入紧急状态、战争状态的，发布动员令的是()。',
-    options: [{ label: 'A', text: '国务院' }, { label: 'B', text: '全国人大' }, { label: 'C', text: '国家主席' }, { label: 'D', text: '全国人大常委会' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 72,
-    question: '()是一个国家赖以存在的战略空间，是国家存在和发展的自然物质前提，是构成国家的基本要素之一。主权 统一',
-    options: [{ label: 'A', text: '领土' }, { label: 'B', text: '安全' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 73,
-    question: '《中华人民共和国国防法》明确了()。',
-    options: [{ label: 'A', text: '中国共产党对武装力量的领导' }, { label: 'B', text: '我国现行的兵役制度' }, { label: 'C', text: '高校应设置国防教育课程' }, { label: 'D', text: '人民防空的方针' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 74,
-    question: '中国的国家战略目标,就是实现在()成立一百年时全面建成小康社会、在()成立一百年时建成富强民主文明和谐的社会主义现代化国家的奋斗目标。',
-    options: [{ label: 'A', text: '中国共产党新中国' }, { label: 'B', text: '新中国中国共产党' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 75,
-    question: '()虽然推翻了清朝的统治，建立了中华民国，但并没有改变中国任人宰割的状况。',
-    options: [{ label: 'A', text: '辛亥革命' }, { label: 'B', text: '南昌起义' }, { label: 'C', text: '广州起义' }, { label: 'D', text: '秋收起义' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 76,
-    question: '1945年抗日战争胜利后，为避免内战、争取和平，中国共产党与国民党政府进行的为期43天的和平谈判，史称()谈判。',
-    options: [{ label: 'A', text: '重庆' }, { label: 'B', text: '南京' }, { label: 'C', text: '北平' }, { label: 'D', text: '西安' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 77,
-    question: '()是国家或政治集团所拥有的各种武装组织的总称。',
-    options: [{ label: 'A', text: '军事力量' }, { label: 'B', text: '国防力量' }, { label: 'C', text: '武装力量' }, { label: 'D', text: '综合力量' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 78,
-    question: '()是不脱离生产的群众武装组织，是中国武装力量的重要组成部分，是人民解放军的助手和后备力量。',
-    options: [{ label: 'A', text: '中国人民解放军' }, { label: 'B', text: '中国人民武装警察部队' }, { label: 'C', text: '民兵' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 79,
-    question: '()是中国武装力量的主体力量。',
-    options: [{ label: 'A', text: '中国人民解放军' }, { label: 'B', text: '中国人民武装警察部队' }, { label: 'C', text: '民兵' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 80,
-    question: '战时宣传教育和面向社会的思想发动属于()。',
-    options: [{ label: 'A', text: '武装力量动员' }, { label: 'B', text: '人民防空动员' }, { label: 'C', text: '信息动员' }, { label: 'D', text: '政治动员' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 81,
-    question: '1895年在()中，日本逼迫清政府将钓鱼岛群岛随同台湾一起割让给了日本。',
-    options: [{ label: 'A', text: '“二十一条”' }, { label: 'B', text: '《辛丑条约》' }, { label: 'C', text: '《东三省事宜条约》' }, { label: 'D', text: '《马关条约》' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 82,
-    question: '中国发展核武器的主要目的是()。',
-    options: [{ label: 'A', text: '发动核战争' }, { label: 'B', text: '遏制核战争' }, { label: 'C', text: '核讹诈' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 83,
-    question: '1937年()事变爆发，全面抗战由此开始。',
-    options: [{ label: 'A', text: '九一八' }, { label: 'B', text: '一二八' }, { label: 'C', text: '华北' }, { label: 'D', text: '卢沟桥' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 84,
-    question: '我国全民国家安全教育日是()。',
-    options: [{ label: 'A', text: '每年4月15日' }, { label: 'B', text: '每年4月24日' }, { label: 'C', text: '每年5月12日' }, { label: 'D', text: '每年10月15日' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 85,
-    question: '2014年，我国将12月13日确定为国家国家公祭日，与该公祭日直接相关的历史事件是()。',
-    options: [{ label: 'A', text: '九一八事变' }, { label: 'B', text: '七七事变' }, { label: 'C', text: '台儿庄战役' }, { label: 'D', text: '南京大屠杀' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 86,
-    question: '()是新时代中国国防的鲜明特征。',
-    options: [{ label: 'A', text: '坚持永不称霸' }, { label: 'B', text: '坚决捍卫国家主权、安全、发展利益坚持走中国特色强军之路' }, { label: 'C', text: '服务构建人类命运共同体' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 87,
-    question: '党的十九大报告指出“我们的军队是人民军队，我们的国防是()国防。我们要加强全民国防教育，巩固军政军民团结，为实现中国梦强军梦凝聚强大力量”。',
-    options: [{ label: 'A', text: '全民' }, { label: 'B', text: '军队' }, { label: 'C', text: '学校' }, { label: 'D', text: '全社会' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 88,
-    question: '1842年，由于鸦片战争失败，清政府被迫同()签订了中国近代史上第一个不平等条约，即《南京条约》。',
-    options: [{ label: 'A', text: '英国' }, { label: 'B', text: '法国' }, { label: 'C', text: '美国' }, { label: 'D', text: '日本' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 89,
-    question: '()是新时代中国国防的根本目标。',
-    options: [{ label: 'A', text: '坚持永不称霸' }, { label: 'B', text: '坚决捍卫国家主权、安全、发展利益' }, { label: 'C', text: '坚持走中国特色强军之路' }, { label: 'D', text: '贯彻落实新时代军事战略方针' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 90,
-    question: '()是人民军队性质和宗旨不变的根本保证。',
-    options: [{ label: 'A', text: '中国共产党的绝对领导' }, { label: 'B', text: '紧密联系群众' }, { label: 'C', text: '党支部建在连上' }, { label: 'D', text: '坚持政治工作民主制' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 91,
-    question: '国防动员的主体是()。',
-    options: [{ label: 'A', text: '公民' }, { label: 'B', text: '国家' }, { label: 'C', text: '全民' }, { label: 'D', text: '人民' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 92,
-    question: '()为国家公祭日。',
-    options: [{ label: 'A', text: '每年9月3日' }, { label: 'B', text: '每年9月30日' }, { label: 'C', text: '每年12月13日' }, { label: 'D', text: '每年12月30日' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 93,
-    question: '()是实现军民融合发展的重要途经。',
-    options: [{ label: 'A', text: '国防教育' }, { label: 'B', text: '国防建设' }, { label: 'C', text: '人民防空' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 94,
-    question: '中国人民的抗日战争共打了()。',
-    options: [{ label: 'A', text: '8年' }, { label: 'B', text: '12年' }, { label: 'C', text: '14年' }, { label: 'D', text: '5年' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 95,
-    question: '()是新时代中国国防的世界意义。',
-    options: [{ label: 'A', text: '坚持走中国特色强军之路' }, { label: 'B', text: '服务构建人类命运共同体' }, { label: 'C', text: '贯彻落实新时代军事战略方针' }, { label: 'D', text: '坚持永不称霸' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 96,
-    question: '根据《国防法》规定，我国国防的对象包括()。',
-    options: [{ label: 'A', text: '军事斗争' }, { label: 'B', text: '侵略武装颠覆' }, { label: 'C', text: '恐怖袭击武装颠覆' }, { label: 'D', text: '跨国犯罪' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 97,
-    question: '为庆祝我国海军成立70周，2019年4月23日，在()举行海上阅兵活动。',
-    options: [{ label: 'A', text: '渤海' }, { label: 'B', text: '南海' }, { label: 'C', text: '沈阳' }, { label: 'D', text: '青岛' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 98,
-    question: '中国人民的抗日战争开始于1937年7月7日。()',
-    options: [{ label: 'A', text: '正确' }, { label: 'B', text: '错误' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 99,
-    question: '美国的国防类型是()。',
-    options: [{ label: 'A', text: '联盟型' }, { label: 'B', text: '扩张型' }, { label: 'C', text: '自卫型' }, { label: 'D', text: '中立型' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 100,
-    question: '我国全民国防教育日是()。',
-    options: [{ label: 'A', text: '每年3月第3个星期六' }, { label: 'B', text: '每年6月第3个星期日' }, { label: 'C', text: '每年9月第3个星期六' }, { label: 'D', text: '每年9月第3个星期日' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 101,
-    question: '（)是国防强大的基础。',
-    options: [{ label: 'A', text: '政治开明' }, { label: 'B', text: '军事科技发展' }, { label: 'C', text: '军队人才培养' }, { label: 'D', text: '经济发展' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 102,
-    question: '中国人民解放军火箭军部队的主要装备武器是()。',
-    options: [{ label: 'A', text: '火炮' }, { label: 'B', text: '坦克' }, { label: 'C', text: '导弹' }, { label: 'D', text: '运载火箭' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 103,
-    question: '()在国防法规体系中占有统帅地位并起着核心作用，是其他军事立法的基本法律依据。',
-    options: [{ label: 'A', text: '《兵役法》' }, { label: 'B', text: '《反分裂国家法》' }, { label: 'C', text: '《国防教育法》' }, { label: 'D', text: '《国防法》' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 104,
-    question: '中国人民解放军陆军成立于()。',
-    options: [{ label: 'A', text: '19270801' }, { label: 'B', text: '19490423' }, { label: 'C', text: '19660701' }, { label: 'D', text: '19491112' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 105,
-    question: '根据《国防法》规定，我国武装力量受()领导。',
-    options: [{ label: 'A', text: '国家主席' }, { label: 'B', text: '国务院' }, { label: 'C', text: '中国共产党' }, { label: 'D', text: '全国人大' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 106,
-    question: '()是指国家根据国防需要，使社会诸领域全部或部分由平时状态转人战争状态或紧急状态所进行的活动。',
-    options: [{ label: 'A', text: '国防' }, { label: 'B', text: '国防建设' }, { label: 'C', text: '国防法规' }, { label: 'D', text: '国防动员' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 107,
-    question: '在1982年中英香港问题谈判中，中国坚持()问题不能谈判。',
-    options: [{ label: 'A', text: '香港驻军' }, { label: 'B', text: '司法' }, { label: 'C', text: '政治制度' }, { label: 'D', text: '主权' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 108,
-    question: '解放军空军的主体兵种是()。',
-    options: [{ label: 'A', text: '航空兵' }, { label: 'B', text: '防空兵' }, { label: 'C', text: '雷达兵' }, { label: 'D', text: '通信兵' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 109,
-    question: '印度在兵力部署上，凸现“北防”战略方针，主要防范（ ）。',
-    options: [{ label: 'A', text: '俄罗斯' }, { label: 'B', text: '巴基斯坦' }, { label: 'C', text: '中国' }, { label: 'D', text: '不丹' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 110,
-    question: '“一国两制”构想是（）',
-    options: [{ label: 'A', text: '从解决台湾问题开始提出的' }, { label: 'B', text: '从解决香港问题开始提出的' }, { label: 'C', text: '从解决澳门问题开始提出的' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 111,
-    question: '《高边》是美国（）著，首次提出了”高边疆”（太空）战略的概念。',
-    options: [{ label: 'A', text: '马汉' }, { label: 'B', text: '格雷厄姆' }, { label: 'C', text: '杜黑' }, { label: 'D', text: '富勒' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 112,
-    question: '近代资产阶级主要军事思想代表作《战争艺术概论》的作者是（）。',
-    options: [{ label: 'A', text: '马汉' }, { label: 'B', text: '克劳塞维茨' }, { label: 'C', text: '若米尼' }, { label: 'D', text: '富勒' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 113,
-    question: '毛泽东在《论持久战》中指出，只有实行（）才能赢得抗日战争胜利。',
-    options: [{ label: 'A', text: '非接触打击' }, { label: 'B', text: '人民战争' }, { label: 'C', text: '精确打击' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 114,
-    question: '和平与发展是当今世界的主题，这一论断是由()提出来的。',
-    options: [{ label: 'A', text: '毛泽东' }, { label: 'B', text: '邓小平' }, { label: 'C', text: '江泽民' }, { label: 'D', text: '胡锦涛' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 115,
-    question: '德国陆军大将古德里安提出（）理论。',
-    options: [{ label: 'A', text: '海权论' }, { label: 'B', text: '制空权' }, { label: 'C', text: '总体战' }, { label: 'D', text: '闪电战' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 116,
-    question: '习近平提出党在新形势下的强军目标，即建设一支听党指挥、（）、作风优良的人民军队。',
-    options: [{ label: 'A', text: '武器先进' }, { label: 'B', text: '设施完备' }, { label: 'C', text: '能打胜仗' }, { label: 'D', text: '训练严格' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 117,
-    question: '毛泽东指出：“（）是战争的决定因素。”',
-    options: [{ label: 'A', text: '政治' }, { label: 'B', text: '人' }, { label: 'C', text: '经济' }, { label: 'D', text: '武器' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 118,
-    question: '1919年，中国在巴黎和会上的外交失败成为（）的直接导火线。',
-    options: [{ label: 'A', text: '新文化运动' }, { label: 'B', text: '五四运动' }, { label: 'C', text: '五卅运动' }, { label: 'D', text: '一二·九运动' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 119,
-    question: '邓小平新时期军队建设思想是（）在新时期的继承和发展。',
-    options: [{ label: 'A', text: '中国古代军事思想' }, { label: 'B', text: '刘邓军事思想' }, { label: 'C', text: '斯大林军事思想' }, { label: 'D', text: '毛泽东军事思想' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 120,
-    question: '2012年11月29日，习近平在参观《复兴之路》展览时指出，()，就是中华民族近代以来最伟大的梦想。',
-    options: [{ label: 'A', text: '实现民族独立、人民解放' }, { label: 'B', text: '建设社会主义和谐社会' }, { label: 'C', text: '实现中华民族伟大复兴' }, { label: 'D', text: '推进中国特色社会主义事业' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 121,
-    question: '当今世界的主题是和平与发展，在较长时间内不发生（）是可能的。',
-    options: [{ label: 'A', text: '世界大战' }, { label: 'B', text: '反恐战争' }, { label: 'C', text: '局部战争' }, { label: 'D', text: '网络战争' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 122,
-    question: '创立海权论并成为世界最著名海军战略理论家的是（）海军上校马汉。',
-    options: [{ label: 'A', text: '英国' }, { label: 'B', text: '美国' }, { label: 'C', text: '法国' }, { label: 'D', text: '荷兰' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 123,
-    question: '“用兵之法，无恃其不来，恃吾有以待也；无恃其不攻，恃吾有所不可攻也”。这是孙武（）的体现。',
-    options: [{ label: 'A', text: '重战思想' }, { label: 'B', text: '慎战思想' }, { label: 'C', text: '备战思想' }, { label: 'D', text: '好战思想' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 124,
-    question: '克劳塞维茨的()是外国军事思想的杰出代表，被誉为西方的《孙子兵法》。',
-    options: [{ label: 'A', text: '《战争论》' }, { label: 'B', text: '《制空权》' }, { label: 'C', text: '《海权论》' }, { label: 'D', text: '《机械化作战理论》' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 125,
-    question: '美国军事家（）的”海权论”提出”谁控制了海洋，谁就能控制世界”。',
-    options: [{ label: 'A', text: '富勒' }, { label: 'B', text: '杜黑' }, { label: 'C', text: '马汉' }, { label: 'D', text: '鲁登道夫' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 126,
-    question: '江泽民提出全面推进军队建设的”五句话”总要求中（）体现了”打得赢”。',
-    options: [{ label: 'A', text: '政治合格' }, { label: 'B', text: '作风优良' }, { label: 'C', text: '纪律严明' }, { label: 'D', text: '军事过硬' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 127,
-    question: '()不是我军政治工作三大原则。',
-    options: [{ label: 'A', text: '官兵一致' }, { label: 'B', text: '军民一致' }, { label: 'C', text: '瓦解敌军' }, { label: 'D', text: '民主集中' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 128,
-    question: '《司马法》是”武经七书”之一，春秋末期（）所撰。',
-    options: [{ label: 'A', text: '孙武' }, { label: 'B', text: '孙膑' }, { label: 'C', text: '吴起' }, { label: 'D', text: '司马穰苴' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 129,
-    question: '江泽民同志提出我军的两个历史性课题是（）。',
-    options: [{ label: 'A', text: '打得赢，不变质' }, { label: 'B', text: '打赢战争，遏制战争' }, { label: 'C', text: '人才兴军，科技强军' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 130,
-    question: '()的问世，标志着封建社会军事思想的成熟。',
-    options: [{ label: 'A', text: '《孙膑兵法》' }, { label: 'B', text: '《吴子兵法》' }, { label: 'C', text: '《孙子兵法》' }, { label: 'D', text: '《司马法》' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 131,
-    question: '（）是明代著名军事家、抗倭名将戚继光在东南沿海平倭战争期间练兵和治军经验的总结。',
-    options: [{ label: 'A', text: '《吴子兵法》' }, { label: 'B', text: '《纪效新书》' }, { label: 'C', text: '《孙子兵法》' }, { label: 'D', text: '《司马法》' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 132,
-    question: '()是军队最重要的战略资源。',
-    options: [{ label: 'A', text: '武器装备' }, { label: 'B', text: '优良传统' }, { label: 'C', text: '军事人才' }, { label: 'D', text: '战斗精神' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 133,
-    question: '（）起义标志着中国共产党独立领导革命战争、创建人民军队的开端。',
-    options: [{ label: 'A', text: '广州' }, { label: 'B', text: '秋收' }, { label: 'C', text: '南昌' }, { label: 'D', text: '百色' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 134,
-    question: '中国现存最有价值、最具影响力的古代第一兵书是（）。',
-    options: [{ label: 'A', text: '《孙子兵法》' }, { label: 'B', text: '《孙膑兵法》' }, { label: 'C', text: '《司马法》' }, { label: 'D', text: '《三十六计》' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 135,
-    question: '（）指出：“故百战百胜，非善之善者也；不战而屈人之兵，善之善者也”。',
-    options: [{ label: 'A', text: '《楚兵法》' }, { label: 'B', text: '《司马法》' }, { label: 'C', text: '《孙子兵法》' }, { label: 'D', text: '《百战兵法》' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 136,
-    question: '中国共产党开创的第一块农村革命根据地是（）',
-    options: [{ label: 'A', text: '晋察冀根据地' }, { label: 'B', text: '井冈山根据地' }, { label: 'C', text: '湘鄂西根据地' }, { label: 'D', text: '鄂豫皖根据地' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 137,
-    question: '杜黑系统地提出了()理论，深刻影响了世界现代军事思想的发展及战争实践。',
-    options: [{ label: 'A', text: '闪电战' }, { label: 'B', text: '制海权' }, { label: 'C', text: '机械化作战' }, { label: 'D', text: '制空权' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 138,
-    question: '战争胜负的决定力量是（）。',
-    options: [{ label: 'A', text: '武器装备' }, { label: 'B', text: '军事科技' }, { label: 'C', text: '地形气候' }, { label: 'D', text: '人民群众' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 139,
-    question: '战争分正义战争和非正义战争，共产党人对待战争的态度是（）。',
-    options: [{ label: 'A', text: '反对正义战争' }, { label: 'B', text: '反对一切战争' }, { label: 'C', text: '拥护非正义战争' }, { label: 'D', text: '拥护正义战争，反对非正义战争' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 140,
-    question: '《孙子兵法》开篇就指出”兵者，国之大事”这句话体现了（）军事思想。',
-    options: [{ label: 'A', text: '轻战' }, { label: 'B', text: '慎战' }, { label: 'C', text: '备战' }, { label: 'D', text: '重战' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 141,
-    question: '世界空军先期理论家（）将军最早系统地阐述了”制空权”。',
-    options: [{ label: 'A', text: '美国人马汉' }, { label: 'B', text: '英国人富勒' }, { label: 'C', text: '意大利人杜黑' }, { label: 'D', text: '德国人古德里安' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 142,
-    question: '孙子曰：“带甲十万，日费千金”，说明（）是国防强大的物质基础。',
-    options: [{ label: 'A', text: '政治清明' }, { label: 'B', text: '经济发展' }, { label: 'C', text: '强大的军队' }, { label: 'D', text: '全民国防意识' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 143,
-    question: '积极防御是以积极的攻势行动战胜进攻之敌的防御，又称（）。',
-    options: [{ label: 'A', text: '单纯防御' }, { label: 'B', text: '决战防御' }, { label: 'C', text: '专守防御' }, { label: 'D', text: '攻势防御' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 144,
-    question: '党的（）会议实际上确立了毛泽东在党内的领导地位。',
-    options: [{ label: 'A', text: '八七' }, { label: 'B', text: '遵义' }, { label: 'C', text: '瓦窑堡' }, { label: 'D', text: '洛川' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 145,
-    question: '毛泽东在（）会议上首次提出”政权是从枪杆子里取得的”的著名论断。',
-    options: [{ label: 'A', text: '南昌' }, { label: 'B', text: '八七' }, { label: 'C', text: '遵义' }, { label: 'D', text: '古田' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 146,
-    question: '2012年11月29日，习近平在参观《复兴之路》展览时指出，(),就是中华民族近代以来最伟大的梦想。',
-    options: [{ label: 'A', text: '实现民族独立、人民解放' }, { label: 'B', text: '建设社会主义和谐社会' }, { label: 'C', text: '实现中华民族伟大复兴' }, { label: 'D', text: '推进中国特色社会主义事业' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 147,
-    question: '“小推车推出来的胜利”是指（）。',
-    options: [{ label: 'A', text: '辽沈战役' }, { label: 'B', text: '平津战役' }, { label: 'C', text: '淮海战役' }, { label: 'D', text: '渡江战役' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 148,
-    question: '（）是宋朝作为官书颁行的兵法丛书，是中国古代第一部军事教科书。',
-    options: [{ label: 'A', text: '《孙子兵法》' }, { label: 'B', text: '《武经七书》' }, { label: 'C', text: '《武经总要》' }, { label: 'D', text: '《武备志》' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 149,
-    question: '习近平明确指出，实现中华民族伟大复兴的中国梦就是要实现国家富强、（）、人民幸福。',
-    options: [{ label: 'A', text: '和平发展' }, { label: 'B', text: '民族振兴' }, { label: 'C', text: '世界和平' }, { label: 'D', text: '公平正义' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 150,
-    question: '“先打分散和孤立之敌，后打集中和强大之敌”的提出者是（）。',
-    options: [{ label: 'A', text: '孙子' }, { label: 'B', text: '拿破仑' }, { label: 'C', text: '毛泽东' }, { label: 'D', text: '朱德' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 151,
-    question: '毛泽东提出以乡村为中心的思想，初步形成农村包围城市、武装夺取政权的理论的著作是《（）》。',
-    options: [{ label: 'A', text: '星星之火，可以燎原' }, { label: 'B', text: '中国的红色政权为什么能够存在?' }, { label: 'C', text: '井冈山的斗争' }, { label: 'D', text: '反对本本主义' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 152,
-    question: '德国鲁登道夫提出（）理论，强调动员国家一切力量、使用一切手段进行战争。',
-    options: [{ label: 'A', text: '海权论' }, { label: 'B', text: '制空权' }, { label: 'C', text: '总体战' }, { label: 'D', text: '闪电战' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 153,
-    question: '中国古代军事思想的趋向成熟期是（）。',
-    options: [{ label: 'A', text: '夏、商、西周' }, { label: 'B', text: '春秋战国' }, { label: 'C', text: '秦至五代' }, { label: 'D', text: '宋至清前期' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 154,
-    question: '抗战时期，（）不是我军三大任务。',
-    options: [{ label: 'A', text: '战斗队' }, { label: 'B', text: '工作队' }, { label: 'C', text: '生产队' }, { label: 'D', text: '武工队' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 155,
-    question: '党的（）精辟概括习近平领航强军兴军的伟大成就和理论创造，鲜明提出习近平强军思想。',
-    options: [{ label: 'A', text: '十九大' }, { label: 'B', text: '十八大' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 156,
-    question: '“政治是不流血的战争，战争是流血的政治”形象地说明( )。',
-    options: [{ label: 'A', text: '战争与经济的关系' }, { label: 'B', text: '战争的规律' }, { label: 'C', text: '战争的性质' }, { label: 'D', text: '战争与政治的关系' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 157,
-    question: '1938年，毛泽东发表的系统阐述抗日战争特点、前途和发展规律的著作是《（）》。',
-    options: [{ label: 'A', text: '论反对日本帝国主义的策略' }, { label: 'B', text: '论持久战' }, { label: 'C', text: '论新阶段' }, { label: 'D', text: '论联合政府' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 158,
-    question: '毛泽东指出，战争的伟力之最深厚的根源存在于（）之中。',
-    options: [{ label: 'A', text: '民众' }, { label: 'B', text: '武器' }, { label: 'C', text: '军队' }, { label: 'D', text: '国家' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 159,
-    question: '《吴子兵法》的作者是（），是我国古代著名军事家。',
-    options: [{ label: 'A', text: '孙膑' }, { label: 'B', text: '吴起' }, { label: 'C', text: '司马穰苴' }, { label: 'D', text: '孙武' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 160,
-    question: '( )中国军事思想发展到一个全新的阶段，且在第三世界国家产生深远影响。',
-    options: [{ label: 'A', text: '孙子兵法' }, { label: 'B', text: '邓小平新时期军队建设思想' }, { label: 'C', text: '毛泽东军事思想' }, { label: 'D', text: '江泽民国防和军队建设思想' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 161,
-    question: '《战争论》的作者是（）。',
-    options: [{ label: 'A', text: '克劳塞维茨' }, { label: 'B', text: '拿破仑' }, { label: 'C', text: '约米尼' }, { label: 'D', text: '威灵顿' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 162,
-    question: '春秋末期，吴国著名将领（）著作的《孙子兵法》，是中国现存最早的兵书，也被誉为”兵学圣典”。',
-    options: [{ label: 'A', text: '孙膑' }, { label: 'B', text: '孙武' }, { label: 'C', text: '孙权' }, { label: 'D', text: '孙思邈' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 163,
-    question: '无产阶级战争观认为，战争是阶级斗争的（）。',
-    options: [{ label: 'A', text: '一般形式' }, { label: 'B', text: '基本形式' }, { label: 'C', text: '主要形式' }, { label: 'D', text: '最高形式' }],
-    answerLabel: 'D',
-  },
-  {
-    id: 164,
-    question: '“国防建设要服从经济建设大局”，这是（）提出的观点。',
-    options: [{ label: 'A', text: '周恩来' }, { label: 'B', text: '邓小平' }, { label: 'C', text: '江泽民' }, { label: 'D', text: '胡锦涛' }],
-    answerLabel: 'B',
-  },
-  {
-    id: 165,
-    question: '1997年7月1日，香港回归祖国，标志着邓小平（）构想获得巨大成功。',
-    options: [{ label: 'A', text: '改革开放' }, { label: 'B', text: '全方位外交' }, { label: 'C', text: '“一国两制”' }, { label: 'D', text: '和谐世界' }],
-    answerLabel: 'C',
-  },
-  {
-    id: 166,
-    question: '机械工业时代战争理论的代表作是富勒的()。',
-    options: [{ label: 'A', text: '《装甲战》' }, { label: 'B', text: '《制空权》' }, { label: 'C', text: '《暴力论》' }, { label: 'D', text: '《战争艺术概论》' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 167,
-    question: '（）是人民军队建军之本、强军之魂。',
-    options: [{ label: 'A', text: '党对军队的绝对领导' }, { label: 'B', text: '思想政治工作' }, { label: 'C', text: '军队训练' }, { label: 'D', text: '艰苦奋斗' }],
-    answerLabel: 'A',
-  },
-  {
-    id: 168,
-    question: '毛泽东指出，战争是（）政治。',
-    options: [{ label: 'A', text: '不流血的' }, { label: 'B', text: '流血的' }, { label: 'C', text: '残酷的' }, { label: 'D', text: '暴力的' }],
-    answerLabel: 'A',
-  },
-]
-
-// ─── State ────────────────────────────────────────────
-const PAGE_SIZE = 5;
-let currentMode = 'all';
-let currentPage = 0;
-let userAnswers = {}; // { questionId: 'A' }
-let isCorrect = {};   // { questionId: true/false }
-let randomOrder = [];
-let timerSeconds = 0;
-let timerInterval = null;
-let timerRunning = false;
-
-// ─── Init ─────────────────────────────────────────────
-function init() {
-  document.getElementById('totalCount').textContent = QUIZ_DATA.length;
-  
-  // Load saved state
-  try {
-    const saved = JSON.parse(localStorage.getItem('quiz_state') || '{}');
-    if (saved.answers) userAnswers = saved.answers;
-    if (saved.correct) isCorrect = saved.correct;
-    if (saved.mode) currentMode = saved.mode;
-    if (saved.timerSeconds) timerSeconds = saved.timerSeconds;
-  } catch(e) {}
-  
-  // Load theme
-  const theme = localStorage.getItem('quiz_theme') || 'light';
-  document.documentElement.setAttribute('data-theme', theme);
-  updateThemeIcon(theme);
-  
-  updateTimerDisplay();
-  setMode(currentMode, true);
-  updateStats();
-  
-  // Auto-start timer if there are unanswered questions
-  const totalAnswered = Object.keys(userAnswers).length;
-  if (totalAnswered < QUIZ_DATA.length && !timerRunning) {
-    startTimer();
-  }
-}
-
-function saveState() {
-  localStorage.setItem('quiz_state', JSON.stringify({
-    answers: userAnswers,
-    correct: isCorrect,
-    mode: currentMode,
-    timerSeconds: timerSeconds,
-  }));
-}
-
-// ─── Timer ────────────────────────────────────────────
-function startTimer() {
-  if (timerRunning) return;
-  timerRunning = true;
-  timerInterval = setInterval(() => {
-    timerSeconds++;
-    updateTimerDisplay();
-    // Auto-save every 10 seconds
-    if (timerSeconds % 10 === 0) saveState();
-  }, 1000);
-}
-
-function stopTimer() {
-  timerRunning = false;
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
-  saveState();
-}
-
-function resetTimer() {
-  stopTimer();
-  timerSeconds = 0;
-  updateTimerDisplay();
-  saveState();
-}
-
-function updateTimerDisplay() {
-  const m = Math.floor(timerSeconds / 60);
-  const s = timerSeconds % 60;
-  document.getElementById('statTimer').textContent = 
-    String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-}
-
-// ─── Mode ─────────────────────────────────────────────
-function setMode(mode, skipSave) {
-  currentMode = mode;
-  currentPage = 0;
-  randomOrder = [];
-  
-  document.querySelectorAll('.controls .btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.mode === mode);
-  });
-  
-  if (mode === 'random') {
-    randomOrder = [...Array(QUIZ_DATA.length).keys()]
-      .sort(() => Math.random() - 0.5);
-    // Reset answers for fresh random round
-    userAnswers = {};
-    isCorrect = {};
-    resetTimer();
-    startTimer();
-  } else {
-    // Start timer if not already running and there are unanswered questions
-    if (!timerRunning) startTimer();
-  }
-  
-  if (!skipSave) saveState();
-  renderQuestions();
-}
-
-// ─── Get Filtered Questions ───────────────────────────
-function getFilteredQuestions() {
-  let filtered = [];
-  
-  for (let i = 0; i < QUIZ_DATA.length; i++) {
-    const q = QUIZ_DATA[i];
-    const qid = q.id;
-    
-    switch(currentMode) {
-      case 'all':
-        filtered.push({...q, index: i});
-        break;
-      case 'unanswered':
-        if (!(qid in userAnswers)) filtered.push({...q, index: i});
-        break;
-      case 'wrong':
-        if (isCorrect[qid] === false) filtered.push({...q, index: i});
-        break;
-      case 'random':
-        filtered.push({...q, index: i});
-        break;
-    }
-  }
-  
-  if (currentMode === 'random' && randomOrder.length > 0) {
-    filtered.sort((a, b) => {
-      const ai = QUIZ_DATA.indexOf(QUIZ_DATA.find(q => q.id === a.id));
-      const bi = QUIZ_DATA.indexOf(QUIZ_DATA.find(q => q.id === b.id));
-      return randomOrder.indexOf(ai) - randomOrder.indexOf(bi);
-    });
-  }
-  
-  return filtered;
-}
-
-// ─── Render ───────────────────────────────────────────
-function renderQuestions() {
-  const container = document.getElementById('questionsContainer');
-  const filtered = getFilteredQuestions();
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  
-  if (filtered.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
+    <div class="input-group">
+      <input
+        type="password"
+        id="passwordInput"
+        placeholder="请输入密码"
+        autocomplete="off"
+        maxlength="20"
+      />
+      <button class="toggle-password" id="toggleBtn" type="button">
+        <svg id="eyeOff" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+          <path d="m14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
         </svg>
-        <h3>${currentMode === 'wrong' ? '没有错题，太棒了！' : currentMode === 'unanswered' ? '所有题目已完成！' : '暂无题目'}</h3>
-        <p>${currentMode === 'wrong' ? '继续保持 💪' : '换个模式看看吧'}</p>
-      </div>`;
-    document.getElementById('navButtons').style.display = 'none';
-    updateProgress(filtered);
-    return;
-  }
-  
-  const start = currentPage * PAGE_SIZE;
-  const pageQuestions = filtered.slice(start, start + PAGE_SIZE);
-  
-  container.innerHTML = pageQuestions.map((q, idx) => {
-    const qid = q.id;
-    const answered = qid in userAnswers;
-    const correct = isCorrect[qid];
-    const selectedLabel = userAnswers[qid];
-    const answerLabel = q.answerLabel;
-    
-    let cardClass = '';
-    if (answered && correct) cardClass = 'answered-correct';
-    else if (answered && !correct) cardClass = 'answered-wrong';
-    
-    let numClass = 'unanswered';
-    if (answered && correct) numClass = 'correct-num';
-    else if (answered && !correct) numClass = 'wrong-num';
-    
-    const optionsHtml = q.options.map(opt => {
-      let optClass = '';
-      if (answered) {
-        if (opt.label === answerLabel) optClass = 'correct-answer';
-        else if (opt.label === selectedLabel && selectedLabel !== answerLabel) optClass = 'wrong-answer';
-      } else if (opt.label === selectedLabel) {
-        optClass = 'selected';
+        <svg id="eyeOn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+
+    <p class="error-msg" id="errorMsg"></p>
+
+    <button class="unlock-btn" id="unlockBtn">
+      <span class="btn-text">验证进入</span>
+      <span class="btn-spinner"></span>
+    </button>
+
+    <p class="lock-footer">国防教育知识刷题 · 请向管理员获取密码</p>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════
+    //  配置区 —— 在这里修改密码
+    // ═══════════════════════════════════════
+    const CORRECT_PASSWORD = '2506062';   // ← 改成你想要的密码
+    const TARGET_PAGE = 'app.html';             // ← 验证通过后跳转的页面（原页面改名）
+    // ═══════════════════════════════════════
+
+    // 背景粒子
+    (function createParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        const size = Math.random() * 4 + 2;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        particle.style.animationDelay = (Math.random() * 10) + 's';
+        container.appendChild(particle);
       }
-      return `
-        <button class="option-btn ${optClass} ${answered ? 'disabled' : ''}"
-                onclick="${answered ? '' : `selectAnswer(${qid}, '${opt.label}')`}">
-          <span class="option-label">${opt.label}</span>
-          <span>${opt.text}</span>
-        </button>`;
-    }).join('');
-    
-    let feedbackHtml = '';
-    if (answered) {
-      const fbClass = correct ? 'correct' : 'wrong';
-      const fbText = correct 
-        ? `✅ 回答正确！`
-        : `❌ 回答错误，正确答案是 <strong>${answerLabel}. ${q.options.find(o=>o.label===answerLabel)?.text || ''}</strong>`;
-      feedbackHtml = `<div class="feedback ${fbClass} show">${fbText}</div>`;
+    })();
+
+    // DOM
+    const passwordInput = document.getElementById('passwordInput');
+    const unlockBtn = document.getElementById('unlockBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const eyeOff = document.getElementById('eyeOff');
+    const eyeOn = document.getElementById('eyeOn');
+
+    // 密码显示/隐藏
+    toggleBtn.addEventListener('click', () => {
+      const isPassword = passwordInput.type === 'password';
+      passwordInput.type = isPassword ? 'text' : 'password';
+      eyeOff.style.display = isPassword ? 'none' : 'block';
+      eyeOn.style.display = isPassword ? 'block' : 'none';
+    });
+
+    // 回车键提交
+    passwordInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') unlockBtn.click();
+    });
+
+    // 提交验证
+    unlockBtn.addEventListener('click', () => {
+      const input = passwordInput.value.trim();
+
+      if (!input) {
+        showError('请输入密码');
+        passwordInput.focus();
+        return;
+      }
+
+      // 模拟加载
+      unlockBtn.classList.add('loading');
+      errorMsg.classList.remove('show');
+
+      setTimeout(() => {
+        if (input === CORRECT_PASSWORD) {
+          // 密码正确 → 设置 session 标记并跳转
+          sessionStorage.setItem('military_authenticated', 'true');
+          window.location.href = TARGET_PAGE;
+        } else {
+          // 密码错误
+          unlockBtn.classList.remove('loading');
+          showError('密码错误，请重试');
+          passwordInput.value = '';
+          passwordInput.focus();
+          // 抖动效果
+          passwordInput.style.animation = 'none';
+          passwordInput.offsetHeight;
+          passwordInput.style.animation = 'shake 0.4s ease';
+        }
+      }, 600);
+    });
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.classList.add('show');
     }
-    
-    return `
-      <div class="question-card ${cardClass}">
-        <div class="question-number ${numClass}">${qid}</div>
-        <div class="question-text">${q.question}</div>
-        <div class="options-list">${optionsHtml}</div>
-        ${feedbackHtml}
-      </div>`;
-  }).join('');
-  
-  // Pagination
-  const navBtns = document.getElementById('navButtons');
-  if (totalPages > 1) {
-    navBtns.style.display = 'flex';
-    document.getElementById('prevBtn').disabled = currentPage === 0;
-    document.getElementById('nextBtn').disabled = currentPage >= totalPages - 1;
-    document.getElementById('pageInfo').textContent = `第 ${currentPage + 1}/${totalPages} 页`;
-  } else {
-    navBtns.style.display = 'none';
-  }
-  
-  updateProgress(filtered);
-}
 
-function updateProgress(filtered) {
-  if (!filtered) filtered = getFilteredQuestions();
-  const total = QUIZ_DATA.length;
-  const answered = Object.keys(userAnswers).length;
-  const correct = Object.values(isCorrect).filter(v => v === true).length;
-  const wrong = Object.values(isCorrect).filter(v => v === false).length;
-  
-  document.getElementById('statAnswered').textContent = answered;
-  document.getElementById('statCorrect').textContent = correct;
-  document.getElementById('statWrong').textContent = wrong;
-  document.getElementById('statAccuracy').textContent = answered > 0 ? Math.round(correct / answered * 100) + '%' : '-';
-  
-  // Overall progress
-  const pct = total > 0 ? Math.round(answered / total * 100) : 0;
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressLabel').textContent = `进度 ${answered}/${total}`;
-  document.getElementById('progressPercent').textContent = pct + '%';
-}
+    // 自动聚焦
+    passwordInput.focus();
+  </script>
 
-// ─── Answer Selection ─────────────────────────────────
-function selectAnswer(qid, label) {
-  const q = QUIZ_DATA.find(q => q.id === qid);
-  if (!q) return;
-  
-  userAnswers[qid] = label;
-  isCorrect[qid] = (label === q.answerLabel);
-  
-  saveState();
-  
-  // Check if all questions are answered in random mode
-  if (currentMode === 'random') {
-    const totalAnswered = Object.keys(userAnswers).length;
-    if (totalAnswered >= QUIZ_DATA.length) {
-      // All done! Show summary, then reshuffle
-      stopTimer();
-      const m = Math.floor(timerSeconds / 60);
-      const s = timerSeconds % 60;
-      const correct = Object.values(isCorrect).filter(v => v === true).length;
-      const timeStr = m > 0 ? `${m}分${s}秒` : `${s}秒`;
-      const msg = `🎉 本轮完成！\n正确：${correct}/${QUIZ_DATA.length}\n正确率：${Math.round(correct/QUIZ_DATA.length*100)}%\n用时：${timeStr}\n\n即将开始新一轮随机刷题…`;
-      alert(msg);
-      
-      // Reshuffle and restart
-      randomOrder = [...Array(QUIZ_DATA.length).keys()]
-        .sort(() => Math.random() - 0.5);
-      userAnswers = {};
-      isCorrect = {};
-      currentPage = 0;
-      resetTimer();
-      startTimer();
-      saveState();
-      renderQuestions();
-      window.scrollTo(0, 0);
-      return;
+  <style>
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
     }
-  }
-  
-  renderQuestions();
-  
-  // Auto-advance in random mode
-  if (currentMode === 'random') {
-    const filtered = getFilteredQuestions();
-    const currentIdx = filtered.findIndex(q => q.id === qid);
-    if (currentIdx >= 0 && currentIdx % PAGE_SIZE === PAGE_SIZE - 1 && currentPage < Math.ceil(filtered.length / PAGE_SIZE) - 1) {
-      setTimeout(() => nextPage(), 600);
-    }
-  }
-}
+  </style>
 
-// ─── Pagination ───────────────────────────────────────
-function prevPage() {
-  if (currentPage > 0) {
-    currentPage--;
-    renderQuestions();
-    window.scrollTo(0, 0);
-  }
-}
-
-function nextPage() {
-  const filtered = getFilteredQuestions();
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  if (currentPage < totalPages - 1) {
-    currentPage++;
-    renderQuestions();
-    window.scrollTo(0, 0);
-  }
-}
-
-// ─── Theme Toggle ─────────────────────────────────────
-document.getElementById('themeToggle').addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('quiz_theme', next);
-  updateThemeIcon(next);
-});
-
-function updateThemeIcon(theme) {
-  const icon = document.getElementById('themeIcon');
-  if (theme === 'dark') {
-    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-  } else {
-    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-  }
-}
-
-// ─── Start ────────────────────────────────────────────
-init();
-</script>
 </body>
 </html>
