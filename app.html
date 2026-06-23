@@ -1077,6 +1077,12 @@ function confirmMultiSelect(qid) {
   isCorrect[qid] = isOk;
 
   saveState();
+  
+  // 在"未答题"模式下，先通过 DOM 操作给当前卡片加上反馈
+  if (currentMode === 'unanswered') {
+    showMultiInlineFeedback(qid, q);
+  }
+  
   renderQuestions();
   
   // 重刷模式下检查是否全部完成
@@ -1088,6 +1094,23 @@ function confirmMultiSelect(qid) {
       var msg2 = '📝 错题重刷完成！\n正确：' + redoCorrect2 + '/' + redoIds2.length + '\n正确率：' + Math.round(redoCorrect2/redoIds2.length*100) + '%\n\n点击确定返回正常模式';
       setTimeout(function() { alert(msg2); exitRedoMode(); }, 300);
     }
+  }
+  
+  // 在"未答题"模式下，延迟刷新以移除已答题目
+  if (currentMode === 'unanswered') {
+    setTimeout(function() {
+      var filtered2 = getFilteredQuestions();
+      var totalPages2 = Math.ceil(filtered2.length / PAGE_SIZE);
+      if (filtered2.length === 0) {
+        renderQuestions();
+      } else if (currentPage >= totalPages2) {
+        currentPage = Math.max(0, totalPages2 - 1);
+        renderQuestions();
+        window.scrollTo(0, 0);
+      } else {
+        renderQuestions();
+      }
+    }, 1500);
   }
   
   // 滚动到当前题目，确保用户能看到反馈
@@ -1104,6 +1127,84 @@ function confirmMultiSelect(qid) {
       }
     }
   }, 100);
+}
+
+// 多选题版：在"未答题"模式下直接给 DOM 卡片添加反馈
+function showMultiInlineFeedback(qid, q) {
+  var cards = document.querySelectorAll('.question-card');
+  for (var i = 0; i < cards.length; i++) {
+    var numEl = cards[i].querySelector('.question-number');
+    if (numEl && parseInt(numEl.textContent) === qid) {
+      var card = cards[i];
+      var isOk = isCorrect[qid];
+      
+      // 添加卡片样式
+      card.classList.add(isOk ? 'answered-correct' : 'answered-wrong');
+      
+      // 更新题号样式
+      numEl.classList.remove('unanswered');
+      numEl.classList.add(isOk ? 'correct-num' : 'wrong-num');
+      
+      // 隐藏确认按钮和多选提示
+      var confirmBtns = card.querySelectorAll('.confirm-btn, .multi-hint');
+      confirmBtns.forEach(function(el) { el.style.display = 'none'; });
+      
+      // 高亮选项
+      var correctLabels = q.answerLabels || [];
+      var userSelected = userAnswers[qid] || [];
+      var btns = card.querySelectorAll('.option-btn');
+      btns.forEach(function(btn) {
+        var labelSpan = btn.querySelector('.option-label');
+        if (!labelSpan) return;
+        var optLabel = labelSpan.textContent;
+        btn.classList.add('disabled');
+        btn.onclick = null;
+        
+        var isCorrectOpt = correctLabels.indexOf(optLabel) >= 0;
+        var isSelected = userSelected.indexOf(optLabel) >= 0;
+        
+        if (isCorrectOpt && isSelected) {
+          btn.classList.add('correct-answer');
+        } else if (isCorrectOpt && !isSelected) {
+          btn.classList.add('correct-answer', 'missed');
+        } else if (!isCorrectOpt && isSelected) {
+          btn.classList.add('wrong-answer');
+        }
+      });
+      
+      // 添加反馈文字
+      var fbDiv = document.createElement('div');
+      if (isOk) {
+        fbDiv.className = 'feedback correct show';
+        fbDiv.textContent = '✅ 回答正确！';
+      } else {
+        fbDiv.className = 'feedback wrong show';
+        var missed = correctLabels.filter(function(l) { return userSelected.indexOf(l) === -1; });
+        var extra = userSelected.filter(function(l) { return correctLabels.indexOf(l) === -1; });
+        var parts = [];
+        if (missed.length > 0) {
+          var missedTexts = missed.map(function(l) {
+            var o = q.options.find(function(x) { return x.label === l; });
+            return '<span class="fb-missed">' + l + '. ' + (o ? o.text : '') + '</span>';
+          }).join('、');
+          parts.push('漏选：' + missedTexts);
+        }
+        if (extra.length > 0) {
+          var extraTexts = extra.map(function(l) {
+            var o = q.options.find(function(x) { return x.label === l; });
+            return '<span class="fb-extra">' + l + '. ' + (o ? o.text : '') + '</span>';
+          }).join('、');
+          parts.push('多选：' + extraTexts);
+        }
+        fbDiv.innerHTML = '❌ 回答错误。' + parts.join('；');
+      }
+      card.appendChild(fbDiv);
+      
+      break;
+    }
+  }
+  
+  updateStats();
 }
 
 function redoMultiSelect(qid) {
@@ -1166,6 +1267,12 @@ function selectAnswer(qid, label) {
   
   saveState();
   
+  // 在"未答题"模式下，先通过 DOM 操作给当前卡片加上反馈，
+  // 因为 renderQuestions 会重新过滤，导致该题立即消失。
+  if (currentMode === 'unanswered') {
+    showInlineFeedback(qid, q);
+  }
+  
   // Check if all questions are answered in redo mode
   if (currentMode === 'redo') {
     var redoIds = window.redoQuestionIds || [];
@@ -1210,6 +1317,23 @@ function selectAnswer(qid, label) {
   
   renderQuestions();
   
+  // 在"未答题"模式下，延迟刷新以移除已答题目
+  if (currentMode === 'unanswered') {
+    setTimeout(function() {
+      var filtered2 = getFilteredQuestions();
+      var totalPages2 = Math.ceil(filtered2.length / PAGE_SIZE);
+      if (filtered2.length === 0) {
+        renderQuestions();
+      } else if (currentPage >= totalPages2) {
+        currentPage = Math.max(0, totalPages2 - 1);
+        renderQuestions();
+        window.scrollTo(0, 0);
+      } else {
+        renderQuestions();
+      }
+    }, 1500);
+  }
+  
   // Auto-advance in random mode
   if (currentMode === 'random') {
     const filtered = getFilteredQuestions();
@@ -1218,6 +1342,57 @@ function selectAnswer(qid, label) {
       setTimeout(() => nextPage(), 600);
     }
   }
+}
+
+// 在"未答题"模式下，直接在 DOM 上给当前卡片添加反馈（避免重渲染导致题目消失）
+function showInlineFeedback(qid, q) {
+  var cards = document.querySelectorAll('.question-card');
+  for (var i = 0; i < cards.length; i++) {
+    var numEl = cards[i].querySelector('.question-number');
+    if (numEl && parseInt(numEl.textContent) === qid) {
+      var card = cards[i];
+      var isOk = isCorrect[qid];
+      
+      // 添加卡片样式
+      card.classList.add(isOk ? 'answered-correct' : 'answered-wrong');
+      
+      // 更新题号样式
+      numEl.classList.remove('unanswered');
+      numEl.classList.add(isOk ? 'correct-num' : 'wrong-num');
+      
+      // 高亮选项
+      var btns = card.querySelectorAll('.option-btn');
+      var answerLabel = q.answerLabel;
+      btns.forEach(function(btn) {
+        var labelSpan = btn.querySelector('.option-label');
+        if (!labelSpan) return;
+        var optLabel = labelSpan.textContent;
+        btn.classList.add('disabled');
+        btn.onclick = null;
+        
+        if (optLabel === answerLabel) {
+          btn.classList.add('correct-answer');
+        } else if (optLabel === userAnswers[qid]) {
+          btn.classList.add('wrong-answer');
+        }
+      });
+      
+      // 添加反馈文字
+      var fbDiv = document.createElement('div');
+      fbDiv.className = 'feedback ' + (isOk ? 'correct' : 'wrong') + ' show';
+      if (isOk) {
+        fbDiv.textContent = '✅ 回答正确！';
+      } else {
+        var correctOpt = q.options.find(function(o) { return o.label === answerLabel; });
+        fbDiv.innerHTML = '❌ 回答错误，正确答案是 <strong>' + answerLabel + '. ' + (correctOpt ? correctOpt.text : '') + '</strong>';
+      }
+      card.appendChild(fbDiv);
+      
+      break;
+    }
+  }
+  
+  updateStats();
 }
 
 // ─── Pagination ───────────────────────────────────────
