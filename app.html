@@ -638,6 +638,7 @@ let timerSeconds = 0;
 let timerInterval = null;
 let timerRunning = false;
 let persistedMultiCorrect = {}; // 多选题的 isCorrect 备份，用于错题集（内存中清除以避免影响未答题过滤）
+let unansweredMultiSubmitted = {}; // 当前未答题会话中已提交的多选题 ID set
 
 // ─── Init ─────────────────────────────────────────────
 function init() {
@@ -812,6 +813,22 @@ function setMode(mode, skipSave) {
     userAnswers = {};
     isCorrect = {};
     resetTimer();
+  } else if (mode === 'unanswered') {
+    // 切换到未答题模式：清除多选题 isCorrect（备份到 persistedMultiCorrect），
+    // 但保留 unansweredMultiSubmitted 中记录的（本次会话已提交过的）
+    QUIZ_DATA.forEach(function(q) {
+      if (q.multiSelect && (q.id in isCorrect)) {
+        if (q.id in unansweredMultiSubmitted) {
+          // 本次会话中已提交，不清除——保持过滤排除
+        } else {
+          // 旧记录，备份并清除
+          persistedMultiCorrect[q.id] = isCorrect[q.id];
+          delete userAnswers[q.id];
+          delete isCorrect[q.id];
+        }
+      }
+    });
+    if (!timerRunning) startTimer();
   } else {
     // Start timer if not already running and there are unanswered questions
     if (!timerRunning) startTimer();
@@ -1080,6 +1097,11 @@ function confirmMultiSelect(qid) {
   var selectedLabels = selected.slice().sort().join(',');
   var isOk = (correctLabels === selectedLabels);
   isCorrect[qid] = isOk;
+  
+  // 记录当前未答题会话中已提交的多选题
+  if (currentMode === 'unanswered') {
+    unansweredMultiSubmitted[qid] = true;
+  }
 
   saveState();
   
