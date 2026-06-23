@@ -1771,6 +1771,14 @@ let timerRunning = false;
 function init() {
   document.getElementById('totalCount').textContent = QUIZ_DATA.length;
   
+  // 版本检测：题库更新后清除旧数据
+  const DATA_VERSION = 2;
+  const savedVersion = parseInt(localStorage.getItem('quiz_data_version') || '0');
+  if (savedVersion !== DATA_VERSION) {
+    localStorage.removeItem('quiz_state');
+    localStorage.setItem('quiz_data_version', DATA_VERSION);
+  }
+  
   // Load saved state
   try {
     const saved = JSON.parse(localStorage.getItem('quiz_state') || '{}');
