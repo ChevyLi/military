@@ -677,11 +677,11 @@ function init() {
       if (saved.mode) currentMode = saved.mode;
       if (saved.timerSeconds) timerSeconds = saved.timerSeconds;
       
-      // 多选题每次打开都重置为"未做"状态，用户需重新选择并提交
+      // 多选题每次打开清空已选答案（需重新选择），但保留 isCorrect 用于错题集
       QUIZ_DATA.forEach(function(q) {
         if (q.multiSelect && (q.id in isCorrect)) {
           delete userAnswers[q.id];
-          delete isCorrect[q.id];
+          // 不删除 isCorrect[q.id]，保留错题记录用于错题集筛选
         }
       });
     } catch(e) {}
@@ -713,16 +713,16 @@ function init() {
 function saveState() {
   var key = (currentMode === 'redo') ? 'quiz_redo_state' : 'quiz_state';
   
-  // 多选题不持久化——每次打开都重新做
+  // 多选题答案不持久化（每次打开都重新选），但 isCorrect 保留用于错题集筛选
   var cleanAnswers = {};
   var cleanCorrect = {};
   for (var k in userAnswers) {
     var q = QUIZ_DATA.find(function(x) { return x.id === parseInt(k); });
     if (!q || !q.multiSelect) cleanAnswers[k] = userAnswers[k];
   }
+  // 多选题的 isCorrect 也持久化，这样答错的多选题能进入错题集
   for (var k in isCorrect) {
-    var q2 = QUIZ_DATA.find(function(x) { return x.id === parseInt(k); });
-    if (!q2 || !q2.multiSelect) cleanCorrect[k] = isCorrect[k];
+    cleanCorrect[k] = isCorrect[k];
   }
   
   var data = {
@@ -899,7 +899,8 @@ function getFilteredQuestions() {
         filtered.push({...q, index: i});
         break;
       case 'unanswered':
-        if (q.multiSelect ? !(qid in isCorrect) : !(qid in userAnswers)) filtered.push({...q, index: i});
+        // 多选题也以 userAnswers 为准（init 中已清空旧答案，但 isCorrect 保留用于错题集）
+        if (!(qid in userAnswers)) filtered.push({...q, index: i});
         break;
       case 'wrong':
         if (isCorrect[qid] === false) filtered.push({...q, index: i});
