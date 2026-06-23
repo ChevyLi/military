@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<script>(function(){var a=sessionStorage.getItem('military_authenticated');if(!a)window.location.replace('./index.html');})();</script>
+<script>(function(){if(window.location.hash.indexOf('#redo=')===0)return;var a=sessionStorage.getItem('military_authenticated');if(!a)window.location.replace('./index.html');})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>国防教育知识刷题</title>
