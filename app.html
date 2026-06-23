@@ -637,6 +637,7 @@ let randomOrder = [];
 let timerSeconds = 0;
 let timerInterval = null;
 let timerRunning = false;
+let persistedMultiCorrect = {}; // 多选题的 isCorrect 备份，用于错题集（内存中清除以避免影响未答题过滤）
 
 // ─── Init ─────────────────────────────────────────────
 function init() {
@@ -677,11 +678,13 @@ function init() {
       if (saved.mode) currentMode = saved.mode;
       if (saved.timerSeconds) timerSeconds = saved.timerSeconds;
       
-      // 多选题每次打开清空已选答案（需重新选择），但保留 isCorrect 用于错题集
+      // 多选题每次打开清空已选答案和内存 isCorrect（需重新选择并提交），
+      // 但备份 isCorrect 到 persistedMultiCorrect 用于错题集筛选
       QUIZ_DATA.forEach(function(q) {
         if (q.multiSelect && (q.id in isCorrect)) {
+          persistedMultiCorrect[q.id] = isCorrect[q.id];
           delete userAnswers[q.id];
-          // 不删除 isCorrect[q.id]，保留错题记录用于错题集筛选
+          delete isCorrect[q.id];
         }
       });
     } catch(e) {}
@@ -700,7 +703,7 @@ function init() {
   var totalAnsweredInit = 0;
   QUIZ_DATA.forEach(function(q) {
     if (q.multiSelect) {
-      if (q.id in isCorrect) totalAnsweredInit++;
+      if (q.id in isCorrect || q.id in persistedMultiCorrect) totalAnsweredInit++;
     } else {
       if (q.id in userAnswers) totalAnsweredInit++;
     }
@@ -899,11 +902,12 @@ function getFilteredQuestions() {
         filtered.push({...q, index: i});
         break;
       case 'unanswered':
-        // 多选题也以 userAnswers 为准（init 中已清空旧答案，但 isCorrect 保留用于错题集）
-        if (!(qid in userAnswers)) filtered.push({...q, index: i});
+        // 单选题看 userAnswers，多选题看 isCorrect（因为多选题选中选项≠已提交）
+        if (q.multiSelect ? !(qid in isCorrect) : !(qid in userAnswers)) filtered.push({...q, index: i});
         break;
       case 'wrong':
-        if (isCorrect[qid] === false) filtered.push({...q, index: i});
+        // 合并内存 isCorrect 和 persistedMultiCorrect（多选题备份）
+        if (isCorrect[qid] === false || persistedMultiCorrect[qid] === false) filtered.push({...q, index: i});
         break;
       case 'redo':
         if (window.redoQuestionIds && window.redoQuestionIds.indexOf(qid) >= 0) filtered.push({...q, index: i});
@@ -1219,18 +1223,22 @@ function updateProgress(filtered) {
   if (!filtered) filtered = getFilteredQuestions();
   const total = QUIZ_DATA.length;
   
-  // 已答题数：单选题有 userAnswers 就算；多选题有 isCorrect 才算
+  // 已答题数：单选题有 userAnswers 就算；多选题有 isCorrect 或 persistedMultiCorrect 才算
   var answeredCount = 0;
   QUIZ_DATA.forEach(function(q) {
     if (q.multiSelect) {
-      if (q.id in isCorrect) answeredCount++;
+      if (q.id in isCorrect || q.id in persistedMultiCorrect) answeredCount++;
     } else {
       if (q.id in userAnswers) answeredCount++;
     }
   });
   
   const correct = Object.values(isCorrect).filter(v => v === true).length;
-  const wrong = Object.values(isCorrect).filter(v => v === false).length;
+  var wrong = Object.values(isCorrect).filter(v => v === false).length;
+  // 合并 persistedMultiCorrect 中答错的多选题
+  for (var k in persistedMultiCorrect) {
+    if (persistedMultiCorrect[k] === false && !(k in isCorrect)) wrong++;
+  }
   
   document.getElementById('statAnswered').textContent = answeredCount;
   document.getElementById('statCorrect').textContent = correct;
