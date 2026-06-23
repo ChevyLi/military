@@ -304,6 +304,20 @@ body {
   color: #fff !important;
 }
 
+/* 漏选的正解：绿色虚线边框 */
+.option-btn.correct-answer.missed {
+  border-style: dashed !important;
+  border-width: 2px !important;
+  border-color: var(--success) !important;
+  background: rgba(16,185,129,.06) !important;
+}
+
+.option-btn.correct-answer.missed .option-label {
+  background: var(--success) !important;
+  color: #fff !important;
+  opacity: 0.7;
+}
+
 .option-btn.wrong-answer {
   border-color: var(--danger) !important;
   background: rgba(239,68,68,.1) !important;
@@ -455,6 +469,35 @@ body {
 }
 .confirm-btn:active {
   transform: translateY(0);
+}
+
+.confirm-btn.redo-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+.confirm-btn.redo-btn:hover {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  box-shadow: 0 4px 12px rgba(245,158,11,.3);
+}
+
+/* 多选反馈详细标记 */
+.feedback .fb-missed {
+  display: inline-block;
+  padding: 1px 6px;
+  margin: 0 2px;
+  border-radius: 4px;
+  background: rgba(16,185,129,.15);
+  color: #059669;
+  font-weight: 600;
+}
+.feedback .fb-extra {
+  display: inline-block;
+  padding: 1px 6px;
+  margin: 0 2px;
+  border-radius: 4px;
+  background: rgba(239,68,68,.15);
+  color: #dc2626;
+  font-weight: 600;
+  text-decoration: line-through;
 }
 
 /* Page Jump Input */
@@ -3068,8 +3111,14 @@ function renderQuestions() {
         const isCorrectOpt = isMulti 
           ? (q.answerLabels || []).includes(opt.label)
           : (opt.label === answerLabel);
-        if (isCorrectOpt) optClass = 'correct-answer';
-        else if (isSelected) optClass = 'wrong-answer';
+        if (isCorrectOpt && isSelected) {
+          optClass = 'correct-answer';          // 正解且选了 → 绿色
+        } else if (isCorrectOpt && !isSelected) {
+          optClass = 'correct-answer missed';   // 正解但漏选 → 绿色虚线
+        } else if (!isCorrectOpt && isSelected) {
+          optClass = 'wrong-answer';            // 错误但选了 → 红色
+        }
+        // 错误选项没选 → 无样式
       } else if (isSelected) {
         optClass = 'selected';
       }
@@ -3087,17 +3136,35 @@ function renderQuestions() {
       const fbClass = correct ? 'correct' : 'wrong';
       let fbText;
       if (q.multiSelect) {
-        const correctTexts = (q.answerLabels || []).map(function(l) {
-          var o = q.options.find(function(x) { return x.label === l; });
-          return o ? l + '. ' + o.text : l;
-        }).join('；');
-        fbText = correct 
-          ? `✅ 回答正确！`
-          : `❌ 回答错误，正确答案是 <strong>${correctTexts}</strong>`;
+        if (correct) {
+          fbText = `✅ 回答正确！`;
+        } else {
+          // 详细分析：选了哪些、漏了哪些、多选了哪些
+          var correctLabels = q.answerLabels || [];
+          var userSelected = userAnswers[qid] || [];
+          var missed = correctLabels.filter(function(l) { return userSelected.indexOf(l) === -1; });
+          var extra = userSelected.filter(function(l) { return correctLabels.indexOf(l) === -1; });
+          var parts = [];
+          if (missed.length > 0) {
+            var missedTexts = missed.map(function(l) {
+              var o = q.options.find(function(x) { return x.label === l; });
+              return '<span class="fb-missed">' + l + '. ' + (o ? o.text : '') + '</span>';
+            }).join('、');
+            parts.push('漏选：' + missedTexts);
+          }
+          if (extra.length > 0) {
+            var extraTexts = extra.map(function(l) {
+              var o = q.options.find(function(x) { return x.label === l; });
+              return '<span class="fb-extra">' + l + '. ' + (o ? o.text : '') + '</span>';
+            }).join('、');
+            parts.push('多选：' + extraTexts);
+          }
+          fbText = '❌ 回答错误。' + parts.join('；');
+        }
       } else {
         fbText = correct 
           ? `✅ 回答正确！`
-          : `❌ 回答错误，正确答案是 <strong>${answerLabel}. ${q.options.find(o=>o.label===answerLabel)?.text || ''}</strong>`;
+          : `❌ 回答错误，正确答案是 <strong>${answerLabel}. ${q.options.find(function(o){return o.label===answerLabel;})?.text || ''}</strong>`;
       }
       feedbackHtml = `<div class="feedback ${fbClass} show">${fbText}</div>`;
     }
@@ -3109,6 +3176,7 @@ function renderQuestions() {
         ${q.multiSelect && !(qid in isCorrect) ? '<div class="multi-hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> 多选题：请选择所有正确答案后点击下方"确认提交"</div>' : ''}
         <div class="options-list">${optionsHtml}</div>
         ${q.multiSelect && !(qid in isCorrect) ? `<button class="confirm-btn" onclick="confirmMultiSelect(${qid})">确认提交</button>` : ''}
+        ${q.multiSelect && (qid in isCorrect) ? `<button class="confirm-btn redo-btn" onclick="redoMultiSelect(${qid})">重做此题</button>` : ''}
         ${feedbackHtml}
       </div>`;
   }).join('');
@@ -3126,6 +3194,13 @@ function confirmMultiSelect(qid) {
   var selectedLabels = selected.slice().sort().join(',');
   isCorrect[qid] = (correctLabels === selectedLabels);
 
+  saveState();
+  renderQuestions();
+}
+
+function redoMultiSelect(qid) {
+  delete isCorrect[qid];
+  delete userAnswers[qid];
   saveState();
   renderQuestions();
 }
