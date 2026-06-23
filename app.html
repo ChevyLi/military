@@ -1001,14 +1001,22 @@ function confirmMultiSelect(qid) {
   if (!q || !q.multiSelect) return;
 
   var selected = userAnswers[qid] || [];
-  if (selected.length === 0) return;
+  if (selected.length === 0) {
+    alert('请先选择至少一个选项再提交！');
+    return;
+  }
 
   var correctLabels = q.answerLabels.slice().sort().join(',');
   var selectedLabels = selected.slice().sort().join(',');
-  isCorrect[qid] = (correctLabels === selectedLabels);
+  var isOk = (correctLabels === selectedLabels);
+  isCorrect[qid] = isOk;
 
   saveState();
   renderQuestions();
+  
+  // 滚动到当前题目，确保用户能看到反馈
+  var card = document.querySelector('.question-card.answered-correct, .question-card.answered-wrong');
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function redoMultiSelect(qid) {
