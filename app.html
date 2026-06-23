@@ -1951,20 +1951,22 @@ function renderQuestions() {
     const optionsHtml = q.options.map(opt => {
       let optClass = '';
       const isMulti = q.multiSelect;
-      if (isMulti) {
-        const selectedArr = userAnswers[qid] || [];
-        const isAnswered = qid in isCorrect;
-        const isSelected = selectedArr.includes(opt.label);
-        if (isAnswered) {
-          const isCorrectOpt = (q.answerLabels || []).includes(opt.label);
-          if (isCorrectOpt) optClass = 'correct-answer';
-          else if (isSelected) optClass = 'wrong-answer';
-        } else if (isSelected) {
-          optClass = 'selected';
-        }
-        return `
-        <button class="option-btn ${optClass} ${answered ? 'disabled' : ''}"
-                onclick="${(isMulti ? isAnswered : answered) ? '' : `selectAnswer(${qid}, '${opt.label}')`}">
+      const isAnswered = isMulti ? (qid in isCorrect) : answered;
+      const isSelected = isMulti ? (userAnswers[qid] || []).includes(opt.label) : (selectedLabel === opt.label);
+      
+      if (isAnswered) {
+        const isCorrectOpt = isMulti 
+          ? (q.answerLabels || []).includes(opt.label)
+          : (opt.label === answerLabel);
+        if (isCorrectOpt) optClass = 'correct-answer';
+        else if (isSelected) optClass = 'wrong-answer';
+      } else if (isSelected) {
+        optClass = 'selected';
+      }
+      
+      return `
+        <button class="option-btn ${optClass} ${isAnswered ? 'disabled' : ''}"
+                onclick="${isAnswered ? '' : `selectAnswer(${qid}, '${opt.label}')`}">
           <span class="option-label">${opt.label}</span>
           <span>${opt.text}</span>
         </button>`;
