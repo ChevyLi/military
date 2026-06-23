@@ -3115,6 +3115,8 @@ function selectAnswer(qid, label) {
     } else {
       arr.push(label);
     }
+    saveState();
+    renderQuestions();
     return;
   }
   
