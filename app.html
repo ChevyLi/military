@@ -768,23 +768,20 @@ function setMode(mode, skipSave) {
   currentPage = 0;
   randomOrder = [];
   
-  // 重刷模式：隐藏模式切换按钮，显示标题
+  // 重刷模式：显示标题 + 返回按钮
   var controls = document.querySelector('.controls');
   var redoTitle = document.getElementById('redoTitle');
   if (mode === 'redo') {
-    if (controls) controls.style.display = 'none';
     if (!redoTitle) {
       redoTitle = document.createElement('div');
       redoTitle.id = 'redoTitle';
-      redoTitle.style.cssText = 'text-align:center;padding:12px 20px;margin-bottom:16px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;border-radius:12px;font-size:16px;font-weight:700;';
+      redoTitle.style.cssText = 'display:flex;align-items:center;justify-content:space-between;text-align:center;padding:12px 20px;margin-bottom:16px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;border-radius:12px;font-size:16px;font-weight:700;';
       document.getElementById('questionsContainer').before(redoTitle);
     }
-    redoTitle.style.display = 'block';
     var count = window.redoQuestionIds ? window.redoQuestionIds.length : 0;
-    redoTitle.textContent = '📝 错题重刷 — ' + count + ' 道题';
-    redoTitle.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>错题重刷 — ' + count + ' 道题';
+    redoTitle.style.display = 'flex';
+    redoTitle.innerHTML = '<span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>错题重刷 — ' + count + ' 道题</span><button onclick="exitRedoMode()" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;">← 返回</button>';
   } else {
-    if (controls) controls.style.display = '';
     if (redoTitle) redoTitle.style.display = 'none';
   }
   
@@ -822,16 +819,65 @@ function setMode(mode, skipSave) {
 
 // ─── Get Filtered Questions ───────────────────────────
 function redoWrongMode() {
-  var wrongIds = Object.keys(isCorrect).filter(function(k) { return isCorrect[k] === false; });
+  // 从主存储（quiz_state）获取错题，而非当前内存（当前模式可能已过滤）
+  var wrongIds = [];
+  try {
+    var saved = JSON.parse(localStorage.getItem('quiz_state') || '{}');
+    var savedCorrect = saved.correct || {};
+    for (var k in savedCorrect) {
+      if (savedCorrect[k] === false) wrongIds.push(parseInt(k));
+    }
+  } catch(e) {
+    // fallback：用内存中的 isCorrect
+    wrongIds = Object.keys(isCorrect).filter(function(k) { return isCorrect[k] === false; }).map(Number);
+  }
+  
   if (wrongIds.length === 0) {
     alert('没有错题可以重刷！');
     return;
   }
   
-  // 将错题 ID 编码到 URL hash，在新标签页打开
-  var idsParam = wrongIds.join(',');
-  var url = window.location.origin + window.location.pathname + '#redo=' + idsParam;
-  window.open(url, '_blank');
+  // 直接在当前窗口切换到重刷模式
+  window.redoQuestionIds = wrongIds;
+  setMode('redo');
+  window.scrollTo(0, 0);
+}
+
+function exitRedoMode() {
+  // 把重刷中做对的题目更新回主存储的 isCorrect
+  try {
+    var saved = JSON.parse(localStorage.getItem('quiz_state') || '{}');
+    var savedCorrect = saved.correct || {};
+    var changed = false;
+    for (var k in isCorrect) {
+      var qid = parseInt(k);
+      if (isCorrect[k] === true && window.redoQuestionIds && window.redoQuestionIds.indexOf(qid) >= 0) {
+        savedCorrect[k] = true;
+        changed = true;
+      }
+    }
+    if (changed) {
+      saved.correct = savedCorrect;
+      localStorage.setItem('quiz_state', JSON.stringify(saved));
+    }
+  } catch(e) {}
+  
+  // 恢复主模式状态
+  try {
+    var saved2 = JSON.parse(localStorage.getItem('quiz_state') || '{}');
+    if (saved2.answers) userAnswers = saved2.answers;
+    if (saved2.correct) isCorrect = saved2.correct;
+    if (saved2.mode) currentMode = saved2.mode;
+    if (saved2.timerSeconds) timerSeconds = saved2.timerSeconds;
+  } catch(e) {}
+  
+  // 清理重刷数据
+  window.redoQuestionIds = null;
+  localStorage.removeItem('quiz_redo_state');
+  window.location.hash = '';
+  
+  setMode(currentMode || 'all');
+  window.scrollTo(0, 0);
 }
 
 function getFilteredQuestions() {
@@ -1014,6 +1060,17 @@ function confirmMultiSelect(qid) {
   saveState();
   renderQuestions();
   
+  // 重刷模式下检查是否全部完成
+  if (currentMode === 'redo') {
+    var redoIds2 = window.redoQuestionIds || [];
+    var allDone = redoIds2.every(function(id) { return id in isCorrect; });
+    if (allDone) {
+      var redoCorrect2 = redoIds2.filter(function(id) { return isCorrect[id] === true; }).length;
+      var msg2 = '📝 错题重刷完成！\n正确：' + redoCorrect2 + '/' + redoIds2.length + '\n正确率：' + Math.round(redoCorrect2/redoIds2.length*100) + '%\n\n点击确定返回正常模式';
+      setTimeout(function() { alert(msg2); exitRedoMode(); }, 300);
+    }
+  }
+  
   // 滚动到当前题目，确保用户能看到反馈
   var card = document.querySelector('.question-card.answered-correct, .question-card.answered-wrong');
   if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1092,6 +1149,20 @@ function selectAnswer(qid, label) {
   isCorrect[qid] = (label === q.answerLabel);
   
   saveState();
+  
+  // Check if all questions are answered in redo mode
+  if (currentMode === 'redo') {
+    var redoIds = window.redoQuestionIds || [];
+    var answeredInRedo = Object.keys(userAnswers).filter(function(k) { return redoIds.indexOf(parseInt(k)) >= 0; });
+    if (answeredInRedo.length >= redoIds.length) {
+      stopTimer();
+      var redoCorrect = Object.keys(isCorrect).filter(function(k) { return isCorrect[k] === true && redoIds.indexOf(parseInt(k)) >= 0; }).length;
+      var msg = '📝 错题重刷完成！\n正确：' + redoCorrect + '/' + redoIds.length + '\n正确率：' + Math.round(redoCorrect/redoIds.length*100) + '%\n\n点击确定返回正常模式';
+      alert(msg);
+      exitRedoMode();
+      return;
+    }
+  }
   
   // Check if all questions are answered in random mode
   if (currentMode === 'random') {
