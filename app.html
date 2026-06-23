@@ -697,8 +697,15 @@ function init() {
   updateStats();
   
   // Auto-start timer if there are unanswered questions
-  const totalAnswered = Object.keys(userAnswers).length;
-  if (totalAnswered < QUIZ_DATA.length && !timerRunning) {
+  var totalAnsweredInit = 0;
+  QUIZ_DATA.forEach(function(q) {
+    if (q.multiSelect) {
+      if (q.id in isCorrect) totalAnsweredInit++;
+    } else {
+      if (q.id in userAnswers) totalAnsweredInit++;
+    }
+  });
+  if (totalAnsweredInit < QUIZ_DATA.length && !timerRunning) {
     startTimer();
   }
 }
@@ -892,7 +899,7 @@ function getFilteredQuestions() {
         filtered.push({...q, index: i});
         break;
       case 'unanswered':
-        if (!(qid in userAnswers)) filtered.push({...q, index: i});
+        if (q.multiSelect ? !(qid in isCorrect) : !(qid in userAnswers)) filtered.push({...q, index: i});
         break;
       case 'wrong':
         if (isCorrect[qid] === false) filtered.push({...q, index: i});
