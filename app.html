@@ -1039,9 +1039,21 @@ function renderQuestions() {
         ${feedbackHtml}
       </div>`;
   }).join('');
+
+  const navBtns = document.getElementById('navButtons');
+  if (totalPages > 1) {
+    navBtns.style.display = 'flex';
+    document.getElementById('prevBtn').disabled = currentPage === 0;
+    document.getElementById('nextBtn').disabled = currentPage >= totalPages - 1;
+    document.getElementById('pageInfo').textContent = `第 ${currentPage + 1}/${totalPages} 页`;
+  } else {
+    navBtns.style.display = 'none';
+  }
   
-  
-// Multi-Select Confirmation
+  updateProgress(filtered);
+}
+
+// ─── Multi-Select Confirmation ────────────────────────
 function confirmMultiSelect(qid) {
   var q = QUIZ_DATA.find(function(x) { return x.id === qid; });
   if (!q || !q.multiSelect) return;
@@ -1072,8 +1084,19 @@ function confirmMultiSelect(qid) {
   }
   
   // 滚动到当前题目，确保用户能看到反馈
-  var card = document.querySelector('.question-card.answered-correct, .question-card.answered-wrong');
-  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  setTimeout(function() {
+    var cards = document.querySelectorAll('.question-card.answered-correct, .question-card.answered-wrong');
+    if (cards.length > 0) {
+      // 找到第一个包含该 qid 的卡片
+      for (var i = 0; i < cards.length; i++) {
+        var numEl = cards[i].querySelector('.question-number');
+        if (numEl && parseInt(numEl.textContent) === qid) {
+          cards[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+          break;
+        }
+      }
+    }
+  }, 100);
 }
 
 function redoMultiSelect(qid) {
@@ -1081,20 +1104,6 @@ function redoMultiSelect(qid) {
   delete userAnswers[qid];
   saveState();
   renderQuestions();
-}
-
-// Pagination
-  const navBtns = document.getElementById('navButtons');
-  if (totalPages > 1) {
-    navBtns.style.display = 'flex';
-    document.getElementById('prevBtn').disabled = currentPage === 0;
-    document.getElementById('nextBtn').disabled = currentPage >= totalPages - 1;
-    document.getElementById('pageInfo').textContent = `第 ${currentPage + 1}/${totalPages} 页`;
-  } else {
-    navBtns.style.display = 'none';
-  }
-  
-  updateProgress(filtered);
 }
 
 function updateProgress(filtered) {
