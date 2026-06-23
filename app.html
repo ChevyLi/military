@@ -433,6 +433,29 @@ body {
   .stat-card { padding: 8px 14px; min-width: 60px; }
   .stat-card .stat-value { font-size: 20px; }
 }
+
+.confirm-btn {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 20px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.confirm-btn:hover {
+  background: var(--primary-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79,70,229,.3);
+}
+.confirm-btn:active {
+  transform: translateY(0);
+}
 </style>
 </head>
 <body>
@@ -1528,6 +1551,210 @@ const QUIZ_DATA = [
     options: [{ label: 'A', text: '不流血的' }, { label: 'B', text: '流血的' }, { label: 'C', text: '残酷的' }, { label: 'D', text: '暴力的' }],
     answerLabel: 'A',
   },
+,
+  {
+    id: 169,
+    question: '我国的国防手段包括（）等。',
+    options: [{ label: 'A', text: '军事手段' }, { label: 'B', text: '政治手段' }, { label: 'C', text: '经济手段' }, { label: 'D', text: '科技手段' }],
+    answerLabels: ['A', 'B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 170,
+    question: '我国社会主义制度和国防战略决定了我国的国防是（）。',
+    options: [{ label: 'A', text: '防御型' }, { label: 'B', text: '独立自主型' }, { label: 'C', text: '自卫型' }],
+    answerLabels: ['A', 'B', 'C'],
+    multiSelect: true,
+  },
+  {
+    id: 171,
+    question: '我国国防历史的主要启示有（）。',
+    options: [{ label: 'A', text: '经济发展' }, { label: 'B', text: '政治开明' }, { label: 'C', text: '国家的统一' }, { label: 'D', text: '民族的团结' }],
+    answerLabels: ['A', 'B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 172,
+    question: '抗美援朝时期涌现的英雄人物有很多，其中包括（）。',
+    options: [{ label: 'A', text: '黄继光' }, { label: 'B', text: '邱少云' }, { label: 'C', text: '雷锋' }, { label: 'D', text: '董存瑞' }],
+    answerLabels: ['A', 'B'],
+    multiSelect: true,
+  },
+  {
+    id: 173,
+    question: '我国现行的国防法规体系区分为（）层次。',
+    options: [{ label: 'A', text: '法律' }, { label: 'B', text: '法规' }, { label: 'C', text: '规章' }, { label: 'D', text: '地方性法规' }],
+    answerLabels: ['B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 174,
+    question: '信息化条件下国防动员内容包括（）。',
+    options: [{ label: 'A', text: '武装力量动员' }, { label: 'B', text: '信息动员' }, { label: 'C', text: '政治动员' }, { label: 'D', text: '国防经济动员' }, { label: 'E', text: '人民防空动员' }],
+    answerLabels: ['A', 'B', 'C', 'D', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 175,
+    question: '中国人民解放军火箭军装备的导弹，按照它们的射程可分为（）导弹。',
+    options: [{ label: 'A', text: '近程导弹' }, { label: 'B', text: '中程导弹' }, { label: 'C', text: '远程导弹' }, { label: 'D', text: '洲际导弹' }],
+    answerLabels: ['A', 'B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 176,
+    question: '国防教育的内容包括()等。（2分）',
+    options: [{ label: 'A', text: '国防理论' }, { label: 'B', text: '国防知识' }, { label: 'C', text: '国防历史' }, { label: 'D', text: '国防技能' }, { label: 'E', text: '国防法规' }],
+    answerLabels: ['B', 'C', 'D', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 177,
+    question: '随着科技不断发展，未来领土概念还将不断扩展，（）是未来有可能出现的全新领土概念。',
+    options: [{ label: 'A', text: '海底空间' }, { label: 'B', text: '宇宙空间' }, { label: 'C', text: '地下空间' }, { label: 'D', text: '网络信息空间' }],
+    answerLabels: ['B', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 178,
+    question: '现代国防观包括（）。',
+    options: [{ label: 'A', text: '全民国防观' }, { label: 'B', text: '全域国防观' }, { label: 'C', text: '综合国防观' }, { label: 'D', text: '世界国防观' }],
+    answerLabels: ['B', 'C'],
+    multiSelect: true,
+  },
+  {
+    id: 179,
+    question: '我国国防目的有（）。',
+    options: [{ label: 'A', text: '捍卫国家主权' }, { label: 'B', text: '维护国家统一' }, { label: 'C', text: '保卫国家领土完整' }, { label: 'D', text: '确保国家安全' }],
+    answerLabels: ['B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 180,
+    question: '中国的武装力量组成有（）。',
+    options: [{ label: 'A', text: '解放军现役部队' }, { label: 'B', text: '解放军预备役部队' }, { label: 'C', text: '警察部队' }, { label: 'D', text: '民兵' }],
+    answerLabels: ['B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 181,
+    question: '当前我军的战区包括（）战区。',
+    options: [{ label: 'A', text: '东' }, { label: 'B', text: '南' }, { label: 'C', text: '西' }, { label: 'D', text: '中' }, { label: 'E', text: '北' }],
+    answerLabels: ['B', 'C', 'D', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 182,
+    question: '战争准备包括物质准备和精神准备，（）属于精神准备。',
+    options: [{ label: 'A', text: '建造军事设施' }, { label: 'B', text: '进行国防动员' }, { label: 'C', text: '开展国防教育活动' }, { label: 'D', text: '研制武器装备' }],
+    answerLabels: ['C'],
+    multiSelect: true,
+  },
+  {
+    id: 183,
+    question: '实施军民融合发展战略的核心和实质是实现（）。（2分）',
+    options: [{ label: 'A', text: '信息互通' }, { label: 'B', text: '资源共享' }, { label: 'C', text: '良性互动' }, { label: 'D', text: '融合发展' }],
+    answerLabels: ['B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 184,
+    question: '国防动员按规模分为（）。（2分）',
+    options: [{ label: 'A', text: '局部动员' }, { label: 'B', text: '公开动员' }, { label: 'C', text: '秘密动员' }, { label: 'D', text: '总动员' }, { label: 'E', text: '应急动员' }],
+    answerLabels: ['D'],
+    multiSelect: true,
+  },
+  {
+    id: 185,
+    question: '空中信息化作战平台主要有（）。',
+    options: [{ label: 'A', text: '战斗机' }, { label: 'B', text: '无人机' }, { label: 'C', text: '运输机' }],
+    answerLabels: ['B', 'C'],
+    multiSelect: true,
+  },
+  {
+    id: 186,
+    question: '典型信息化空中作战平台有()。',
+    options: [{ label: 'A', text: '战斗机' }, { label: 'B', text: '运输机' }, { label: 'C', text: '轰炸机' }, { label: 'D', text: '预警机' }],
+    answerLabels: ['B', 'C'],
+    multiSelect: true,
+  },
+  {
+    id: 187,
+    question: '目前世界上掌握载人航天技术的国家有（）。',
+    options: [{ label: 'A', text: '中国' }, { label: 'B', text: '俄罗斯' }, { label: 'C', text: '美国' }, { label: 'D', text: '法国' }],
+    answerLabels: ['B', 'C'],
+    multiSelect: true,
+  },
+  {
+    id: 188,
+    question: '已装备我军的空中信息化作战平台有（）。',
+    options: [{ label: 'A', text: '运-20' }, { label: 'B', text: '歼-20' }, { label: 'C', text: '直-20' }, { label: 'D', text: '轰-20' }],
+    answerLabels: ['B', 'C'],
+    multiSelect: true,
+  },
+  {
+    id: 189,
+    question: '20世纪六七十年代，新中国在国防尖端科技领域取得的重大成就有（）。',
+    options: [{ label: 'A', text: '原子弹爆炸' }, { label: 'B', text: '杂交水稻' }, { label: 'C', text: '氢弾爆炸' }, { label: 'D', text: '人造卫星发射' }],
+    answerLabels: ['D'],
+    multiSelect: true,
+  },
+  {
+    id: 190,
+    question: '导弹按攻击目标可分为（）。',
+    options: [{ label: 'A', text: '巡航导弹' }, { label: 'B', text: '反舰导弹' }, { label: 'C', text: '反辐射导弹' }, { label: 'D', text: '反导弹导弹' }, { label: 'E', text: '反坦克导弹' }],
+    answerLabels: ['C', 'D', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 191,
+    question: '指挥信息系统主要有（）等组成。',
+    options: [{ label: 'A', text: '指挥控制系统' }, { label: 'B', text: '情报侦察系统' }, { label: 'C', text: '通信系统' }, { label: 'D', text: '预警探测系统' }, { label: 'E', text: '综合保障系统' }],
+    answerLabels: ['B', 'C', 'D', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 192,
+    question: '新概念武器与其它武器本质的区别，在于（）等。',
+    options: [{ label: 'A', text: '基本原理不同' }, { label: 'B', text: '杀伤机理不同' }, { label: 'C', text: '作战方式不同' }, { label: 'D', text: '使用时机不同' }],
+    answerLabels: ['A', 'B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 193,
+    question: '美国的无人机有（）。',
+    options: [{ label: 'A', text: 'RQ-4' }, { label: 'B', text: 'MQ-1' }, { label: 'C', text: 'U-2' }, { label: 'D', text: 'X-47B' }],
+    answerLabels: ['A', 'B', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 194,
+    question: '2021年2月，因在边境冲突中誓死捍卫国土，中央军委给（）追记一等功。',
+    options: [{ label: 'A', text: '陈红军' }, { label: 'B', text: '祁发宝' }, { label: 'C', text: '肖思远' }, { label: 'D', text: '陈祥榕' }, { label: 'E', text: '王焯冉' }],
+    answerLabels: ['C', 'D', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 195,
+    question: '信息化装备的发展趋势是（）。',
+    options: [{ label: 'A', text: '无人化' }, { label: 'B', text: 'b—体化' }, { label: 'C', text: '智能化' }, { label: 'D', text: '打击精确化' }, { label: 'E', text: '隐形化' }],
+    answerLabels: ['C', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 196,
+    question: '第四代超声速战斗机的代表机型有(）。(2分）',
+    options: [{ label: 'A', text: 'F-22' }, { label: 'B', text: '歼-20' }, { label: 'C', text: '苏-57' }, { label: 'D', text: 'B-2' }, { label: 'E', text: 'F-35' }],
+    answerLabels: ['A', 'B', 'C', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 197,
+    question: '拥有核潜艇的国家是（）。（2分）',
+    options: [{ label: 'A', text: '日本' }, { label: 'B', text: '中国' }, { label: 'C', text: '俄罗斯' }, { label: 'D', text: '美国' }],
+    answerLabels: ['C', 'D'],
+    multiSelect: true,
+  }
 ]
 
 // ─── State ────────────────────────────────────────────
@@ -1716,15 +1943,21 @@ function renderQuestions() {
     
     const optionsHtml = q.options.map(opt => {
       let optClass = '';
-      if (answered) {
-        if (opt.label === answerLabel) optClass = 'correct-answer';
-        else if (opt.label === selectedLabel && selectedLabel !== answerLabel) optClass = 'wrong-answer';
-      } else if (opt.label === selectedLabel) {
-        optClass = 'selected';
-      }
-      return `
+      const isMulti = q.multiSelect;
+      if (isMulti) {
+        const selectedArr = userAnswers[qid] || [];
+        const isAnswered = qid in isCorrect;
+        const isSelected = selectedArr.includes(opt.label);
+        if (isAnswered) {
+          const isCorrectOpt = (q.answerLabels || []).includes(opt.label);
+          if (isCorrectOpt) optClass = 'correct-answer';
+          else if (isSelected) optClass = 'wrong-answer';
+        } else if (isSelected) {
+          optClass = 'selected';
+        }
+        return `
         <button class="option-btn ${optClass} ${answered ? 'disabled' : ''}"
-                onclick="${answered ? '' : `selectAnswer(${qid}, '${opt.label}')`}">
+                onclick="${(isMulti ? isAnswered : answered) ? '' : `selectAnswer(${qid}, '${opt.label}')`}">
           <span class="option-label">${opt.label}</span>
           <span>${opt.text}</span>
         </button>`;
@@ -1733,9 +1966,20 @@ function renderQuestions() {
     let feedbackHtml = '';
     if (answered) {
       const fbClass = correct ? 'correct' : 'wrong';
-      const fbText = correct 
-        ? `✅ 回答正确！`
-        : `❌ 回答错误，正确答案是 <strong>${answerLabel}. ${q.options.find(o=>o.label===answerLabel)?.text || ''}</strong>`;
+      let fbText;
+      if (q.multiSelect) {
+        const correctTexts = (q.answerLabels || []).map(function(l) {
+          var o = q.options.find(function(x) { return x.label === l; });
+          return o ? l + '. ' + o.text : l;
+        }).join('；');
+        fbText = correct 
+          ? `✅ 回答正确！`
+          : `❌ 回答错误，正确答案是 <strong>${correctTexts}</strong>`;
+      } else {
+        fbText = correct 
+          ? `✅ 回答正确！`
+          : `❌ 回答错误，正确答案是 <strong>${answerLabel}. ${q.options.find(o=>o.label===answerLabel)?.text || ''}</strong>`;
+      }
       feedbackHtml = `<div class="feedback ${fbClass} show">${fbText}</div>`;
     }
     
@@ -1744,11 +1988,29 @@ function renderQuestions() {
         <div class="question-number ${numClass}">${qid}</div>
         <div class="question-text">${q.question}</div>
         <div class="options-list">${optionsHtml}</div>
+        ${q.multiSelect && !answered ? `<button class="confirm-btn" onclick="confirmMultiSelect(${qid})">确认提交</button>` : ''}
         ${feedbackHtml}
       </div>`;
   }).join('');
   
-  // Pagination
+  
+// Multi-Select Confirmation
+function confirmMultiSelect(qid) {
+  var q = QUIZ_DATA.find(function(x) { return x.id === qid; });
+  if (!q || !q.multiSelect) return;
+
+  var selected = userAnswers[qid] || [];
+  if (selected.length === 0) return;
+
+  var correctLabels = q.answerLabels.slice().sort().join(',');
+  var selectedLabels = selected.slice().sort().join(',');
+  isCorrect[qid] = (correctLabels === selectedLabels);
+
+  saveState();
+  renderQuestions();
+}
+
+// Pagination
   const navBtns = document.getElementById('navButtons');
   if (totalPages > 1) {
     navBtns.style.display = 'flex';
@@ -1785,6 +2047,18 @@ function updateProgress(filtered) {
 function selectAnswer(qid, label) {
   const q = QUIZ_DATA.find(q => q.id === qid);
   if (!q) return;
+
+  if (q.multiSelect) {
+    if (!userAnswers[qid]) userAnswers[qid] = [];
+    var arr = userAnswers[qid];
+    var idx = arr.indexOf(label);
+    if (idx >= 0) {
+      arr.splice(idx, 1);
+    } else {
+      arr.push(label);
+    }
+    return;
+  }
   
   userAnswers[qid] = label;
   isCorrect[qid] = (label === q.answerLabel);
