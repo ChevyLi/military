@@ -676,6 +676,14 @@ function init() {
       if (saved.correct) isCorrect = saved.correct;
       if (saved.mode) currentMode = saved.mode;
       if (saved.timerSeconds) timerSeconds = saved.timerSeconds;
+      
+      // 多选题每次打开都重置为"未做"状态，用户需重新选择并提交
+      QUIZ_DATA.forEach(function(q) {
+        if (q.multiSelect && (q.id in isCorrect)) {
+          delete userAnswers[q.id];
+          delete isCorrect[q.id];
+        }
+      });
     } catch(e) {}
   }
   
@@ -697,9 +705,22 @@ function init() {
 
 function saveState() {
   var key = (currentMode === 'redo') ? 'quiz_redo_state' : 'quiz_state';
+  
+  // 多选题不持久化——每次打开都重新做
+  var cleanAnswers = {};
+  var cleanCorrect = {};
+  for (var k in userAnswers) {
+    var q = QUIZ_DATA.find(function(x) { return x.id === parseInt(k); });
+    if (!q || !q.multiSelect) cleanAnswers[k] = userAnswers[k];
+  }
+  for (var k in isCorrect) {
+    var q2 = QUIZ_DATA.find(function(x) { return x.id === parseInt(k); });
+    if (!q2 || !q2.multiSelect) cleanCorrect[k] = isCorrect[k];
+  }
+  
   var data = {
-    answers: userAnswers,
-    correct: isCorrect,
+    answers: cleanAnswers,
+    correct: cleanCorrect,
     timerSeconds: timerSeconds,
   };
   if (currentMode !== 'redo') data.mode = currentMode;
@@ -880,13 +901,18 @@ function renderQuestions() {
     const selectedLabel = userAnswers[qid];
     const answerLabel = q.answerLabel;
     
+    // 对于多选题，"已答"的标准是已提交（isCorrect 中有记录），而非仅选中
+    const multiSubmitted = q.multiSelect && (qid in isCorrect);
+    const effectiveAnswered = q.multiSelect ? multiSubmitted : answered;
+    const effectiveCorrect = q.multiSelect ? (isCorrect[qid] === true) : correct;
+    
     let cardClass = '';
-    if (answered && correct) cardClass = 'answered-correct';
-    else if (answered && !correct) cardClass = 'answered-wrong';
+    if (effectiveAnswered && effectiveCorrect) cardClass = 'answered-correct';
+    else if (effectiveAnswered && !effectiveCorrect) cardClass = 'answered-wrong';
     
     let numClass = 'unanswered';
-    if (answered && correct) numClass = 'correct-num';
-    else if (answered && !correct) numClass = 'wrong-num';
+    if (effectiveAnswered && effectiveCorrect) numClass = 'correct-num';
+    else if (effectiveAnswered && !effectiveCorrect) numClass = 'wrong-num';
     
     const optionsHtml = q.options.map(opt => {
       let optClass = '';
@@ -919,11 +945,11 @@ function renderQuestions() {
     }).join('');
     
     let feedbackHtml = '';
-    if (answered) {
-      const fbClass = correct ? 'correct' : 'wrong';
+    if (effectiveAnswered) {
+      const fbClass = effectiveCorrect ? 'correct' : 'wrong';
       let fbText;
       if (q.multiSelect) {
-        if (correct) {
+        if (effectiveCorrect) {
           fbText = `✅ 回答正确！`;
         } else {
           // 详细分析：选了哪些、漏了哪些、多选了哪些
@@ -949,7 +975,7 @@ function renderQuestions() {
           fbText = '❌ 回答错误。' + parts.join('；');
         }
       } else {
-        fbText = correct 
+        fbText = effectiveCorrect 
           ? `✅ 回答正确！`
           : `❌ 回答错误，正确答案是 <strong>${answerLabel}. ${q.options.find(function(o){return o.label===answerLabel;})?.text || ''}</strong>`;
       }
@@ -1009,19 +1035,29 @@ function redoMultiSelect(qid) {
 function updateProgress(filtered) {
   if (!filtered) filtered = getFilteredQuestions();
   const total = QUIZ_DATA.length;
-  const answered = Object.keys(userAnswers).length;
+  
+  // 已答题数：单选题有 userAnswers 就算；多选题有 isCorrect 才算
+  var answeredCount = 0;
+  QUIZ_DATA.forEach(function(q) {
+    if (q.multiSelect) {
+      if (q.id in isCorrect) answeredCount++;
+    } else {
+      if (q.id in userAnswers) answeredCount++;
+    }
+  });
+  
   const correct = Object.values(isCorrect).filter(v => v === true).length;
   const wrong = Object.values(isCorrect).filter(v => v === false).length;
   
-  document.getElementById('statAnswered').textContent = answered;
+  document.getElementById('statAnswered').textContent = answeredCount;
   document.getElementById('statCorrect').textContent = correct;
   document.getElementById('statWrong').textContent = wrong;
-  document.getElementById('statAccuracy').textContent = answered > 0 ? Math.round(correct / answered * 100) + '%' : '-';
+  document.getElementById('statAccuracy').textContent = answeredCount > 0 ? Math.round(correct / answeredCount * 100) + '%' : '-';
   
   // Overall progress
-  const pct = total > 0 ? Math.round(answered / total * 100) : 0;
+  const pct = total > 0 ? Math.round(answeredCount / total * 100) : 0;
   document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressLabel').textContent = `进度 ${answered}/${total}`;
+  document.getElementById('progressLabel').textContent = `进度 ${answeredCount}/${total}`;
   document.getElementById('progressPercent').textContent = pct + '%';
 }
 
