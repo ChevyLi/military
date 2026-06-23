@@ -456,6 +456,37 @@ body {
 .confirm-btn:active {
   transform: translateY(0);
 }
+
+/* Page Jump Input */
+#pageJumpInput::-webkit-inner-spin-button,
+#pageJumpInput::-webkit-outer-spin-button { opacity: 1; }
+#pageJumpInput:focus { outline: none; border-color: var(--primary) !important; }
+
+/* Wrong Redo Button */
+.wrong-redo-btn {
+  background: linear-gradient(135deg, #f97316, #ef4444) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+.wrong-redo-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239,68,68,.35);
+}
+
+/* Multi-select hint */
+.multi-hint {
+  font-size: 12px;
+  color: #f59e0b;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: rgba(245,158,11,.08);
+  border-radius: 6px;
+  border-left: 3px solid #f59e0b;
+}
 </style>
 </head>
 <body>
@@ -511,6 +542,10 @@ body {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
       随机刷题
     </button>
+    <button class="btn wrong-redo-btn" id="wrongRedoBtn" onclick="redoWrongMode()" style="display:none;gap:6px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      错题重刷
+    </button>
   </div>
 
   <div class="progress-container">
@@ -533,6 +568,10 @@ body {
       上一页
     </button>
     <span style="line-height:40px;color:var(--text-secondary);font-size:14px;" id="pageInfo">第 1 页</span>
+    <span style="display:flex;align-items:center;gap:4px;line-height:40px;color:var(--text-secondary);font-size:13px;">
+      跳至 <input type="number" id="pageJumpInput" min="1" style="width:50px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;text-align:center;font-size:13px;background:var(--card-bg);color:var(--text);" placeholder="页"> 页
+      <button class="btn" onclick="jumpToPage()" style="padding:4px 12px;font-size:12px;">GO</button>
+    </span>
     <button class="btn" id="nextBtn" onclick="nextPage()">
       下一页
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
@@ -1553,210 +1592,6 @@ const QUIZ_DATA = [
   },
   {
     id: 169,
-    question: '我国的国防手段包括（）等。',
-    options: [{ label: 'A', text: '军事手段' }, { label: 'B', text: '政治手段' }, { label: 'C', text: '经济手段' }, { label: 'D', text: '科技手段' }],
-    answerLabels: ['A', 'B', 'C', 'D'],
-    multiSelect: true,
-  },
-  {
-    id: 170,
-    question: '我国社会主义制度和国防战略决定了我国的国防是（）。',
-    options: [{ label: 'A', text: '防御型' }, { label: 'B', text: '独立自主型' }, { label: 'C', text: '自卫型' }],
-    answerLabels: ['A', 'B', 'C'],
-    multiSelect: true,
-  },
-  {
-    id: 171,
-    question: '我国国防历史的主要启示有（）。',
-    options: [{ label: 'A', text: '经济发展' }, { label: 'B', text: '政治开明' }, { label: 'C', text: '国家的统一' }, { label: 'D', text: '民族的团结' }],
-    answerLabels: ['A', 'B', 'C', 'D'],
-    multiSelect: true,
-  },
-  {
-    id: 172,
-    question: '抗美援朝时期涌现的英雄人物有很多，其中包括（）。',
-    options: [{ label: 'A', text: '黄继光' }, { label: 'B', text: '邱少云' }, { label: 'C', text: '雷锋' }, { label: 'D', text: '董存瑞' }],
-    answerLabels: ['A', 'B'],
-    multiSelect: true,
-  },
-  {
-    id: 173,
-    question: '我国现行的国防法规体系区分为（）层次。',
-    options: [{ label: 'A', text: '法律' }, { label: 'B', text: '法规' }, { label: 'C', text: '规章' }, { label: 'D', text: '地方性法规' }],
-    answerLabels: ['B', 'C', 'D'],
-    multiSelect: true,
-  },
-  {
-    id: 174,
-    question: '信息化条件下国防动员内容包括（）。',
-    options: [{ label: 'A', text: '武装力量动员' }, { label: 'B', text: '信息动员' }, { label: 'C', text: '政治动员' }, { label: 'D', text: '国防经济动员' }, { label: 'E', text: '人民防空动员' }],
-    answerLabels: ['A', 'B', 'C', 'D', 'E'],
-    multiSelect: true,
-  },
-  {
-    id: 175,
-    question: '中国人民解放军火箭军装备的导弹，按照它们的射程可分为（）导弹。',
-    options: [{ label: 'A', text: '近程导弹' }, { label: 'B', text: '中程导弹' }, { label: 'C', text: '远程导弹' }, { label: 'D', text: '洲际导弹' }],
-    answerLabels: ['A', 'B', 'C', 'D'],
-    multiSelect: true,
-  },
-  {
-    id: 176,
-    question: '国防教育的内容包括()等。（2分）',
-    options: [{ label: 'A', text: '国防理论' }, { label: 'B', text: '国防知识' }, { label: 'C', text: '国防历史' }, { label: 'D', text: '国防技能' }, { label: 'E', text: '国防法规' }],
-    answerLabels: ['B', 'C', 'D', 'E'],
-    multiSelect: true,
-  },
-  {
-    id: 177,
-    question: '随着科技不断发展，未来领土概念还将不断扩展，（）是未来有可能出现的全新领土概念。',
-    options: [{ label: 'A', text: '海底空间' }, { label: 'B', text: '宇宙空间' }, { label: 'C', text: '地下空间' }, { label: 'D', text: '网络信息空间' }],
-    answerLabels: ['B', 'D'],
-    multiSelect: true,
-  },
-  {
-    id: 178,
-    question: '现代国防观包括（）。',
-    options: [{ label: 'A', text: '全民国防观' }, { label: 'B', text: '全域国防观' }, { label: 'C', text: '综合国防观' }, { label: 'D', text: '世界国防观' }],
-    answerLabels: ['B', 'C'],
-    multiSelect: true,
-  },
-  {
-    id: 179,
-    question: '我国国防目的有（）。',
-    options: [{ label: 'A', text: '捍卫国家主权' }, { label: 'B', text: '维护国家统一' }, { label: 'C', text: '保卫国家领土完整' }, { label: 'D', text: '确保国家安全' }],
-    answerLabels: ['B', 'C', 'D'],
-    multiSelect: true,
-  },
-  {
-    id: 180,
-    question: '中国的武装力量组成有（）。',
-    options: [{ label: 'A', text: '解放军现役部队' }, { label: 'B', text: '解放军预备役部队' }, { label: 'C', text: '警察部队' }, { label: 'D', text: '民兵' }],
-    answerLabels: ['B', 'C', 'D'],
-    multiSelect: true,
-  },
-  {
-    id: 181,
-    question: '当前我军的战区包括（）战区。',
-    options: [{ label: 'A', text: '东' }, { label: 'B', text: '南' }, { label: 'C', text: '西' }, { label: 'D', text: '中' }, { label: 'E', text: '北' }],
-    answerLabels: ['B', 'C', 'D', 'E'],
-    multiSelect: true,
-  },
-  {
-    id: 182,
-    question: '战争准备包括物质准备和精神准备，（）属于精神准备。',
-    options: [{ label: 'A', text: '建造军事设施' }, { label: 'B', text: '进行国防动员' }, { label: 'C', text: '开展国防教育活动' }, { label: 'D', text: '研制武器装备' }],
-    answerLabels: ['C'],
-    multiSelect: true,
-  },
-  {
-    id: 183,
-    question: '实施军民融合发展战略的核心和实质是实现（）。（2分）',
-    options: [{ label: 'A', text: '信息互通' }, { label: 'B', text: '资源共享' }, { label: 'C', text: '良性互动' }, { label: 'D', text: '融合发展' }],
-    answerLabels: ['B', 'C', 'D'],
-    multiSelect: true,
-  },
-  {
-    id: 184,
-    question: '国防动员按规模分为（）。（2分）',
-    options: [{ label: 'A', text: '局部动员' }, { label: 'B', text: '公开动员' }, { label: 'C', text: '秘密动员' }, { label: 'D', text: '总动员' }, { label: 'E', text: '应急动员' }],
-    answerLabels: ['D'],
-    multiSelect: true,
-  },
-  {
-    id: 185,
-    question: '空中信息化作战平台主要有（）。',
-    options: [{ label: 'A', text: '战斗机' }, { label: 'B', text: '无人机' }, { label: 'C', text: '运输机' }],
-    answerLabels: ['B', 'C'],
-    multiSelect: true,
-  },
-  {
-    id: 186,
-    question: '典型信息化空中作战平台有()。',
-    options: [{ label: 'A', text: '战斗机' }, { label: 'B', text: '运输机' }, { label: 'C', text: '轰炸机' }, { label: 'D', text: '预警机' }],
-    answerLabels: ['B', 'C'],
-    multiSelect: true,
-  },
-  {
-    id: 187,
-    question: '目前世界上掌握载人航天技术的国家有（）。',
-    options: [{ label: 'A', text: '中国' }, { label: 'B', text: '俄罗斯' }, { label: 'C', text: '美国' }, { label: 'D', text: '法国' }],
-    answerLabels: ['B', 'C'],
-    multiSelect: true,
-  },
-  {
-    id: 188,
-    question: '已装备我军的空中信息化作战平台有（）。',
-    options: [{ label: 'A', text: '运-20' }, { label: 'B', text: '歼-20' }, { label: 'C', text: '直-20' }, { label: 'D', text: '轰-20' }],
-    answerLabels: ['B', 'C'],
-    multiSelect: true,
-  },
-  {
-    id: 189,
-    question: '20世纪六七十年代，新中国在国防尖端科技领域取得的重大成就有（）。',
-    options: [{ label: 'A', text: '原子弹爆炸' }, { label: 'B', text: '杂交水稻' }, { label: 'C', text: '氢弾爆炸' }, { label: 'D', text: '人造卫星发射' }],
-    answerLabels: ['D'],
-    multiSelect: true,
-  },
-  {
-    id: 190,
-    question: '导弹按攻击目标可分为（）。',
-    options: [{ label: 'A', text: '巡航导弹' }, { label: 'B', text: '反舰导弹' }, { label: 'C', text: '反辐射导弹' }, { label: 'D', text: '反导弹导弹' }, { label: 'E', text: '反坦克导弹' }],
-    answerLabels: ['C', 'D', 'E'],
-    multiSelect: true,
-  },
-  {
-    id: 191,
-    question: '指挥信息系统主要有（）等组成。',
-    options: [{ label: 'A', text: '指挥控制系统' }, { label: 'B', text: '情报侦察系统' }, { label: 'C', text: '通信系统' }, { label: 'D', text: '预警探测系统' }, { label: 'E', text: '综合保障系统' }],
-    answerLabels: ['B', 'C', 'D', 'E'],
-    multiSelect: true,
-  },
-  {
-    id: 192,
-    question: '新概念武器与其它武器本质的区别，在于（）等。',
-    options: [{ label: 'A', text: '基本原理不同' }, { label: 'B', text: '杀伤机理不同' }, { label: 'C', text: '作战方式不同' }, { label: 'D', text: '使用时机不同' }],
-    answerLabels: ['A', 'B', 'C', 'D'],
-    multiSelect: true,
-  },
-  {
-    id: 193,
-    question: '美国的无人机有（）。',
-    options: [{ label: 'A', text: 'RQ-4' }, { label: 'B', text: 'MQ-1' }, { label: 'C', text: 'U-2' }, { label: 'D', text: 'X-47B' }],
-    answerLabels: ['A', 'B', 'D'],
-    multiSelect: true,
-  },
-  {
-    id: 194,
-    question: '2021年2月，因在边境冲突中誓死捍卫国土，中央军委给（）追记一等功。',
-    options: [{ label: 'A', text: '陈红军' }, { label: 'B', text: '祁发宝' }, { label: 'C', text: '肖思远' }, { label: 'D', text: '陈祥榕' }, { label: 'E', text: '王焯冉' }],
-    answerLabels: ['C', 'D', 'E'],
-    multiSelect: true,
-  },
-  {
-    id: 195,
-    question: '信息化装备的发展趋势是（）。',
-    options: [{ label: 'A', text: '无人化' }, { label: 'B', text: 'b—体化' }, { label: 'C', text: '智能化' }, { label: 'D', text: '打击精确化' }, { label: 'E', text: '隐形化' }],
-    answerLabels: ['C', 'E'],
-    multiSelect: true,
-  },
-  {
-    id: 196,
-    question: '第四代超声速战斗机的代表机型有(）。(2分）',
-    options: [{ label: 'A', text: 'F-22' }, { label: 'B', text: '歼-20' }, { label: 'C', text: '苏-57' }, { label: 'D', text: 'B-2' }, { label: 'E', text: 'F-35' }],
-    answerLabels: ['A', 'B', 'C', 'E'],
-    multiSelect: true,
-  },
-  {
-    id: 197,
-    question: '拥有核潜艇的国家是（）。（2分）',
-    options: [{ label: 'A', text: '日本' }, { label: 'B', text: '中国' }, { label: 'C', text: '俄罗斯' }, { label: 'D', text: '美国' }],
-    answerLabels: ['C', 'D'],
-    multiSelect: true,
-  }
-,
-  {
-    id: 198,
     question: `（ ）是世界上最大的轰炸机。`,
     options: [
         {label: 'A', text: `B-2`},
@@ -1768,7 +1603,7 @@ const QUIZ_DATA = [
     answerText: `图-160`
   },
   {
-    id: 199,
+    id: 170,
     question: `1970年4月24日，我国第一颗人造地球卫星“（ ）”发射成功。`,
     options: [
         {label: 'A', text: `北斗一号`},
@@ -1780,7 +1615,7 @@ const QUIZ_DATA = [
     answerText: `东方红一号`
   },
   {
-    id: 200,
+    id: 171,
     question: `1915年，（ ）制成了世界上第一辆坦克。`,
     options: [
         {label: 'A', text: `美国`},
@@ -1792,7 +1627,7 @@ const QUIZ_DATA = [
     answerText: `英国`
   },
   {
-    id: 201,
+    id: 172,
     question: `发展最早、数量最多、应用最广的一种军用卫星是（ ）。`,
     options: [
         {label: 'A', text: `侦察卫星`},
@@ -1804,7 +1639,7 @@ const QUIZ_DATA = [
     answerText: `侦察卫星`
   },
   {
-    id: 202,
+    id: 173,
     question: `2021年5月，我国第二艘（ ）航母编队在南海相关海域进行军事训练。`,
     options: [
         {label: 'A', text: `辽宁舰`},
@@ -1816,7 +1651,7 @@ const QUIZ_DATA = [
     answerText: `山东舰`
   },
   {
-    id: 203,
+    id: 174,
     question: `2011年1月11日，我国第四代隐身战机（ ）在成都实现首飞。`,
     options: [
         {label: 'A', text: `歼-10`},
@@ -1828,7 +1663,7 @@ const QUIZ_DATA = [
     answerText: `歼-20`
   },
   {
-    id: 204,
+    id: 175,
     question: `没有航空母舰的国家是（ ）。`,
     options: [
         {label: 'A', text: `英国`},
@@ -1840,7 +1675,7 @@ const QUIZ_DATA = [
     answerText: `以色列`
   },
   {
-    id: 205,
+    id: 176,
     question: `1964年10月，中国成功地爆炸第一颗（ ），有力地打破了超级大国的核垄断和核讹诈，提高了我国的国际地位。`,
     options: [
         {label: 'A', text: `原子弹`},
@@ -1852,7 +1687,7 @@ const QUIZ_DATA = [
     answerText: `原子弹`
   },
   {
-    id: 206,
+    id: 177,
     question: `1967年6月17日,我国第一颗（ ）爆炸试验成功。`,
     options: [
         {label: 'A', text: `原子弹`},
@@ -1864,21 +1699,7 @@ const QUIZ_DATA = [
     answerText: `氢弹`
   },
   {
-    id: 207,
-    question: `2021年2月，因在边境冲突中誓死捍卫国土，中央军委追授（ ）“卫国戍边英雄”荣誉称号。`,
-    options: [
-        {label: 'A', text: `陈红军`},
-        {label: 'B', text: `祁发宝`},
-        {label: 'C', text: `肖思远`},
-        {label: 'D', text: `陈祥榕`},
-        {label: 'E', text: `王焯冉`}
-    ],
-    multiSelect: true,
-    answerLabels: ['A'],
-    answerText: `陈红军`
-  },
-  {
-    id: 208,
+    id: 178,
     question: `我国首位女航天员是( )。`,
     options: [
         {label: 'A', text: `刘洋`},
@@ -1890,7 +1711,7 @@ const QUIZ_DATA = [
     answerText: `刘洋`
   },
   {
-    id: 209,
+    id: 179,
     question: `首次将网络战用于实战的是( )。`,
     options: [
         {label: 'A', text: `海湾战争`},
@@ -1902,7 +1723,7 @@ const QUIZ_DATA = [
     answerText: `海湾战争`
   },
   {
-    id: 210,
+    id: 180,
     question: `2021年4月29日，中国空间站（ ）核心舱在海南文昌航天发射场成功发射，标志着中国空间站在轨组装建造全面展开。`,
     options: [
         {label: 'A', text: `天舟二号`},
@@ -1914,7 +1735,7 @@ const QUIZ_DATA = [
     answerText: `天和`
   },
   {
-    id: 211,
+    id: 181,
     question: `1999年5月8日，美军出动（ ）轰炸机对中国驻南斯拉夫联盟大使馆进行了轰炸，当场炸死3名中国记者（邵云环、许杏虎和朱颖），造成使馆建筑严重损毁。`,
     options: [
         {label: 'A', text: `B-52`},
@@ -1926,7 +1747,7 @@ const QUIZ_DATA = [
     answerText: `B-2`
   },
   {
-    id: 212,
+    id: 182,
     question: `高超声速飞机是指最大飞行速度大于( )倍声速的飞机。`,
     options: [
         {label: 'A', text: `1`},
@@ -1938,7 +1759,7 @@ const QUIZ_DATA = [
     answerText: `5`
   },
   {
-    id: 213,
+    id: 183,
     question: `人们尊称（ ）为“中国核潜艇之父”。`,
     options: [
         {label: 'A', text: `俞敏`},
@@ -1950,7 +1771,7 @@ const QUIZ_DATA = [
     answerText: `黄旭华`
   },
   {
-    id: 214,
+    id: 184,
     question: `（ ）运输机是美国空军现役最大的战略运输机。`,
     options: [
         {label: 'A', text: `C-5`},
@@ -1962,7 +1783,7 @@ const QUIZ_DATA = [
     answerText: `C-5`
   },
   {
-    id: 215,
+    id: 185,
     question: `（ ）不属于空中信息化作战平台。`,
     options: [
         {label: 'A', text: `战斗机`},
@@ -1974,7 +1795,7 @@ const QUIZ_DATA = [
     answerText: `军用卫星`
   },
   {
-    id: 216,
+    id: 186,
     question: `（ ）是世界上第一个服役的第四代战机。`,
     options: [
         {label: 'A', text: `歼-20`},
@@ -1986,7 +1807,7 @@ const QUIZ_DATA = [
     answerText: `F-22`
   },
   {
-    id: 217,
+    id: 187,
     question: `世界上第一颗人造地球卫星是由（ ）发射成功的。`,
     options: [
         {label: 'A', text: `美国`},
@@ -1998,7 +1819,7 @@ const QUIZ_DATA = [
     answerText: `前苏联`
   },
   {
-    id: 218,
+    id: 188,
     question: `2003年10月15日，神舟五号载人飞船首次将航天员（ ）送入太空。`,
     options: [
         {label: 'A', text: `杨利伟`},
@@ -2010,7 +1831,7 @@ const QUIZ_DATA = [
     answerText: `杨利伟`
   },
   {
-    id: 219,
+    id: 189,
     question: `“国防建设要服从经济建设大局”，这是（ ）提出的观点。`,
     options: [
         {label: 'A', text: `周恩来`},
@@ -2022,7 +1843,7 @@ const QUIZ_DATA = [
     answerText: `邓小平`
   },
   {
-    id: 220,
+    id: 190,
     question: `抗战时期，（ ）不是我军三大任务。`,
     options: [
         {label: 'A', text: `战斗队`},
@@ -2034,7 +1855,7 @@ const QUIZ_DATA = [
     answerText: `武工队`
   },
   {
-    id: 221,
+    id: 191,
     question: `中国现存最有价值、最具影响力的古代第一兵书是（ ）。`,
     options: [
         {label: 'A', text: `《孙子兵法》`},
@@ -2046,7 +1867,7 @@ const QUIZ_DATA = [
     answerText: `《孙子兵法》`
   },
   {
-    id: 222,
+    id: 192,
     question: `2021年6月17日9时22分，搭载( )载人飞船的长征二号F火箭，在酒泉卫星发射中心点火发射，顺利将3名航天员送入太空。`,
     options: [
         {label: 'A', text: `神舟十号`},
@@ -2058,7 +1879,7 @@ const QUIZ_DATA = [
     answerText: `神舟十二号`
   },
   {
-    id: 223,
+    id: 193,
     question: `次声波是频率在20赫兹以下的波，人类的耳朵（ ）听到。`,
     options: [
         {label: 'A', text: `不能`},
@@ -2068,7 +1889,7 @@ const QUIZ_DATA = [
     answerText: `不能`
   },
   {
-    id: 224,
+    id: 194,
     question: `声音在水中的传播速度（ ）在空气中的传播速度。`,
     options: [
         {label: 'A', text: `小于`},
@@ -2079,7 +1900,7 @@ const QUIZ_DATA = [
     answerText: `大于`
   },
   {
-    id: 225,
+    id: 195,
     question: `我国航天员中，首位女太空教师航天员是( )。`,
     options: [
         {label: 'A', text: `刘洋`},
@@ -2091,7 +1912,7 @@ const QUIZ_DATA = [
     answerText: `王亚平`
   },
   {
-    id: 226,
+    id: 196,
     question: `我国第一款自主研制的预警机是（ ）。`,
     options: [
         {label: 'A', text: `空警-1999`},
@@ -2103,7 +1924,7 @@ const QUIZ_DATA = [
     answerText: `空警-2000`
   },
   {
-    id: 227,
+    id: 197,
     question: `（ ）不属于美国无人机。`,
     options: [
         {label: 'A', text: `RQ-4`},
@@ -2115,7 +1936,7 @@ const QUIZ_DATA = [
     answerText: `U-2`
   },
   {
-    id: 228,
+    id: 198,
     question: `( )战争中，F-22战斗机首次参加实战。`,
     options: [
         {label: 'A', text: `利比亚`},
@@ -2127,7 +1948,7 @@ const QUIZ_DATA = [
     answerText: `叙利亚`
   },
   {
-    id: 229,
+    id: 199,
     question: `下列属于空中轰炸机平台的是（ ）。`,
     options: [
         {label: 'A', text: `F-22`},
@@ -2139,7 +1960,7 @@ const QUIZ_DATA = [
     answerText: `B-2`
   },
   {
-    id: 230,
+    id: 200,
     question: `中国全球定位系统的名称是（ ）。`,
     options: [
         {label: 'A', text: `伽俐略`},
@@ -2151,7 +1972,7 @@ const QUIZ_DATA = [
     answerText: `北斗`
   },
   {
-    id: 231,
+    id: 201,
     question: `《司马法》是“武经七书”之一，春秋末期（ ）所撰。`,
     options: [
         {label: 'A', text: `孙武`},
@@ -2163,7 +1984,7 @@ const QUIZ_DATA = [
     answerText: `司马穰苴`
   },
   {
-    id: 232,
+    id: 202,
     question: `“一国两制”构想是（ ）`,
     options: [
         {label: 'A', text: `从解决台湾问题开始提出的`},
@@ -2174,7 +1995,7 @@ const QUIZ_DATA = [
     answerText: `从解决台湾问题开始提出的`
   },
   {
-    id: 233,
+    id: 203,
     question: `1997年7月1日，香港回归祖国，标志着邓小平（ ）构想获得巨大成功。`,
     options: [
         {label: 'A', text: `改革开放`},
@@ -2186,7 +2007,7 @@ const QUIZ_DATA = [
     answerText: `“一国两制”`
   },
   {
-    id: 234,
+    id: 204,
     question: `《孙子兵法》开篇就指出“兵者，国之大事”这句话体现了（ ）军事思想。`,
     options: [
         {label: 'A', text: `轻战`},
@@ -2198,7 +2019,7 @@ const QUIZ_DATA = [
     answerText: `重战`
   },
   {
-    id: 235,
+    id: 205,
     question: `《吴子兵法》的作者是（ ），是我国古代著名军事家。`,
     options: [
         {label: 'A', text: `孙膑`},
@@ -2210,7 +2031,7 @@ const QUIZ_DATA = [
     answerText: `吴起`
   },
   {
-    id: 236,
+    id: 206,
     question: `党的（ ）精辟概括习近平领航强军兴军的伟大成就和理论创造，鲜明提出习近平强军思想。`,
     options: [
         {label: 'A', text: `十九大`},
@@ -2220,7 +2041,7 @@ const QUIZ_DATA = [
     answerText: `十九大`
   },
   {
-    id: 237,
+    id: 207,
     question: `中国古代军事思想的趋向成熟期是（ ）。`,
     options: [
         {label: 'A', text: `夏、商、西周`},
@@ -2232,7 +2053,7 @@ const QUIZ_DATA = [
     answerText: `春秋战国`
   },
   {
-    id: 238,
+    id: 208,
     question: `德国陆军大将古德里安提出（ ）理论。`,
     options: [
         {label: 'A', text: `海权论`},
@@ -2244,7 +2065,7 @@ const QUIZ_DATA = [
     answerText: `闪电战`
   },
   {
-    id: 239,
+    id: 209,
     question: `积极防御是以积极的攻势行动战胜进攻之敌的防御，又称（ ）。`,
     options: [
         {label: 'A', text: `单纯防御`},
@@ -2256,7 +2077,7 @@ const QUIZ_DATA = [
     answerText: `攻势防御`
   },
   {
-    id: 240,
+    id: 210,
     question: `德国鲁登道夫提出（ ）理论，强调动员国家一切力量、使用一切手段进行战争。`,
     options: [
         {label: 'A', text: `海权论`},
@@ -2268,7 +2089,7 @@ const QUIZ_DATA = [
     answerText: `总体战`
   },
   {
-    id: 241,
+    id: 211,
     question: `江泽民同志提出我军的两个历史性课题是（ ）。`,
     options: [
         {label: 'A', text: `打得赢，不变质`},
@@ -2279,7 +2100,7 @@ const QUIZ_DATA = [
     answerText: `打得赢，不变质`
   },
   {
-    id: 242,
+    id: 212,
     question: `无产阶级战争观认为，战争是阶级斗争的（ ）。`,
     options: [
         {label: 'A', text: `一般形式`},
@@ -2291,7 +2112,7 @@ const QUIZ_DATA = [
     answerText: `最高形式`
   },
   {
-    id: 243,
+    id: 213,
     question: `“政治是不流血的战争，战争是流血的政治”形象地说明( )。`,
     options: [
         {label: 'A', text: `战争与经济的关系`},
@@ -2303,7 +2124,7 @@ const QUIZ_DATA = [
     answerText: `战争与政治的关系`
   },
   {
-    id: 244,
+    id: 214,
     question: `克劳塞维茨的( )是外国军事思想的杰出代表，被誉为西方的《孙子兵法》。`,
     options: [
         {label: 'A', text: `《战争论》`},
@@ -2315,7 +2136,7 @@ const QUIZ_DATA = [
     answerText: `《战争论》`
   },
   {
-    id: 245,
+    id: 215,
     question: `“用兵之法，无恃其不来，恃吾有以待也；无恃其不攻，恃吾有所不可攻也”。这是孙武（ ）的体现。`,
     options: [
         {label: 'A', text: `重战思想`},
@@ -2327,7 +2148,7 @@ const QUIZ_DATA = [
     answerText: `备战思想`
   },
   {
-    id: 246,
+    id: 216,
     question: `当今世界的主题是和平与发展，在较长时间内不发生（ ）是可能的。`,
     options: [
         {label: 'A', text: `世界大战`},
@@ -2339,7 +2160,7 @@ const QUIZ_DATA = [
     answerText: `世界大战`
   },
   {
-    id: 247,
+    id: 217,
     question: `毛泽东指出，战争的伟力之最深厚的根源存在于（ ）之中。`,
     options: [
         {label: 'A', text: `民众`},
@@ -2351,7 +2172,7 @@ const QUIZ_DATA = [
     answerText: `民众`
   },
   {
-    id: 248,
+    id: 218,
     question: `美国军事家（ ）的“海权论”提出“谁控制了海洋，谁就能控制世界”。`,
     options: [
         {label: 'A', text: `富勒`},
@@ -2363,7 +2184,7 @@ const QUIZ_DATA = [
     answerText: `马汉`
   },
   {
-    id: 249,
+    id: 219,
     question: `春秋末期，吴国著名将领（ ）著作的《孙子兵法》，是中国现存最早的兵书，也被誉为“兵学圣典”。`,
     options: [
         {label: 'A', text: `孙膑`},
@@ -2375,7 +2196,7 @@ const QUIZ_DATA = [
     answerText: `孙武`
   },
   {
-    id: 250,
+    id: 220,
     question: `( )中国军事思想发展到一个全新的阶段，且在第三世界国家产生深远影响。`,
     options: [
         {label: 'A', text: `孙子兵法`},
@@ -2387,7 +2208,7 @@ const QUIZ_DATA = [
     answerText: `毛泽东军事思想`
   },
   {
-    id: 251,
+    id: 221,
     question: `《战争论》的作者是（ ）。`,
     options: [
         {label: 'A', text: `克劳塞维茨`},
@@ -2399,7 +2220,7 @@ const QUIZ_DATA = [
     answerText: `克劳塞维茨`
   },
   {
-    id: 252,
+    id: 222,
     question: `1938年，毛泽东发表的系统阐述抗日战争特点、前途和发展规律的著作是《（ ）》。`,
     options: [
         {label: 'A', text: `论反对日本帝国主义的策略`},
@@ -2411,7 +2232,7 @@ const QUIZ_DATA = [
     answerText: `论持久战`
   },
   {
-    id: 253,
+    id: 223,
     question: `毛泽东在（ ）会议上首次提出“政权是从枪杆子里取得的”的著名论断。`,
     options: [
         {label: 'A', text: `南昌`},
@@ -2423,7 +2244,7 @@ const QUIZ_DATA = [
     answerText: `八七`
   },
   {
-    id: 254,
+    id: 224,
     question: `创立海权论并成为世界最著名海军战略理论家的是（ ）海军上校马汉。`,
     options: [
         {label: 'A', text: `英国`},
@@ -2435,7 +2256,7 @@ const QUIZ_DATA = [
     answerText: `美国`
   },
   {
-    id: 255,
+    id: 225,
     question: `江泽民提出全面推进军队建设的“五句话”总要求中（ ）体现了“打得赢”。`,
     options: [
         {label: 'A', text: `政治合格`},
@@ -2447,7 +2268,7 @@ const QUIZ_DATA = [
     answerText: `军事过硬`
   },
   {
-    id: 256,
+    id: 226,
     question: `和平与发展是当今世界的主题，这一论断是由( )提出来的。`,
     options: [
         {label: 'A', text: `毛泽东`},
@@ -2459,7 +2280,7 @@ const QUIZ_DATA = [
     answerText: `邓小平`
   },
   {
-    id: 257,
+    id: 227,
     question: `（ ）是宋朝作为官书颁行的兵法丛书，是中国古代第一部军事教科书。`,
     options: [
         {label: 'A', text: `《孙子兵法》`},
@@ -2471,7 +2292,7 @@ const QUIZ_DATA = [
     answerText: `《武经七书》`
   },
   {
-    id: 258,
+    id: 228,
     question: `机枪是坦克的辅助武器，通常有7.62毫米口径的并列机枪和12.7毫米口径的高射机枪，用以歼灭近距离的敌步兵和对付( )目标。`,
     options: [
         {label: 'A', text: `低空`},
@@ -2482,7 +2303,7 @@ const QUIZ_DATA = [
     answerText: `低空`
   },
   {
-    id: 259,
+    id: 229,
     question: `2020年11月10日，我国载人潜水器“（ ）”在世界最深的马里亚纳海沟成功坐底，下潜深度达10909米，再一次创造了我国载人深潜的新纪录。`,
     options: [
         {label: 'A', text: `嫦娥五号`},
@@ -2494,7 +2315,7 @@ const QUIZ_DATA = [
     answerText: `奋斗者号`
   },
   {
-    id: 260,
+    id: 230,
     question: `世界上第一个登上月球的国家是（ ）。`,
     options: [
         {label: 'A', text: `前苏联`},
@@ -2506,7 +2327,7 @@ const QUIZ_DATA = [
     answerText: `美国`
   },
   {
-    id: 261,
+    id: 231,
     question: `我国第四个航天发射中心在（ ）。`,
     options: [
         {label: 'A', text: `江西`},
@@ -2518,7 +2339,7 @@ const QUIZ_DATA = [
     answerText: `海南`
   },
   {
-    id: 262,
+    id: 232,
     question: `2021年11月7日，神州十三号航天员身着“飞天”舱外航天服成功出舱，（ ）成为中国首位进行出舱活动的女航天员。`,
     options: [
         {label: 'A', text: `叶光富`},
@@ -2530,7 +2351,7 @@ const QUIZ_DATA = [
     answerText: `王亚平`
   },
   {
-    id: 263,
+    id: 233,
     question: `1950年至（ ）年的抗美援朝战争，取得了保家卫国的伟大胜利，新中国的国际威望空前提高。`,
     options: [
         {label: 'A', text: `1951`},
@@ -2542,7 +2363,7 @@ const QUIZ_DATA = [
     answerText: `1953`
   },
   {
-    id: 264,
+    id: 234,
     question: `全球卫星导航定位系统中，( )为美国的定位系统。`,
     options: [
         {label: 'A', text: `GLONSS`},
@@ -2554,7 +2375,7 @@ const QUIZ_DATA = [
     answerText: `GPS`
   },
   {
-    id: 265,
+    id: 235,
     question: `人们尊称（ ）为“中国航天之父”、“中国导弹之父”。`,
     options: [
         {label: 'A', text: `钱学森`},
@@ -2566,7 +2387,7 @@ const QUIZ_DATA = [
     answerText: `钱学森`
   },
   {
-    id: 266,
+    id: 236,
     question: `我国第一艘航母名字为（ ），是从乌克兰购得“瓦良格”号全面改装的，属于中型航母，作为试验和训练舰。`,
     options: [
         {label: 'A', text: `南昌号`},
@@ -2578,7 +2399,7 @@ const QUIZ_DATA = [
     answerText: `辽宁号`
   },
   {
-    id: 267,
+    id: 237,
     question: `世界上最早的导弹是由（ ）研制的。`,
     options: [
         {label: 'A', text: `美国`},
@@ -2590,7 +2411,7 @@ const QUIZ_DATA = [
     answerText: `德国`
   },
   {
-    id: 268,
+    id: 238,
     question: `1999年3月24日，美军2架（ ）向南联盟的目标投放了32枚908千克联合直接攻击弹药，这是此款轰炸机首次参加实战。`,
     options: [
         {label: 'A', text: `B-52`},
@@ -2602,7 +2423,7 @@ const QUIZ_DATA = [
     answerText: `B-2`
   },
   {
-    id: 269,
+    id: 239,
     question: `( )拥有“陆战之王”的美称。`,
     options: [
         {label: 'A', text: `坦克`},
@@ -2613,7 +2434,7 @@ const QUIZ_DATA = [
     answerText: `坦克`
   },
   {
-    id: 270,
+    id: 240,
     question: `全球卫星导航定位系统中，( )为欧洲的定位系统。`,
     options: [
         {label: 'A', text: `伽利略`},
@@ -2625,7 +2446,7 @@ const QUIZ_DATA = [
     answerText: `伽利略`
   },
   {
-    id: 271,
+    id: 241,
     question: `（ ）领域始终是社会生活中对科学技术的最新成就利用得最快最多的一个领域。`,
     options: [
         {label: 'A', text: `教育`},
@@ -2637,7 +2458,7 @@ const QUIZ_DATA = [
     answerText: `军事`
   },
   {
-    id: 272,
+    id: 242,
     question: `化学武器大规模使用始于( )。`,
     options: [
         {label: 'A', text: `一战`},
@@ -2649,7 +2470,7 @@ const QUIZ_DATA = [
     answerText: `一战`
   },
   {
-    id: 273,
+    id: 243,
     question: `美国海军最新型现役航母是（ ）。`,
     options: [
         {label: 'A', text: `戴高乐`},
@@ -2661,7 +2482,7 @@ const QUIZ_DATA = [
     answerText: `福特号`
   },
   {
-    id: 274,
+    id: 244,
     question: `2021年4月4日上午8时许，美国海军“（ ）”号航母打击群经由马六甲海峡进入南海活动。`,
     options: [
         {label: 'A', text: `维拉特`},
@@ -2673,7 +2494,7 @@ const QUIZ_DATA = [
     answerText: `罗斯福`
   },
   {
-    id: 275,
+    id: 245,
     question: `按导弹的射程分，射程在1000千米以内的是（ ）导弹。`,
     options: [
         {label: 'A', text: `近程`},
@@ -2685,7 +2506,7 @@ const QUIZ_DATA = [
     answerText: `近程`
   },
   {
-    id: 276,
+    id: 246,
     question: `中国的“风云三号”卫星系统属于（ ）。`,
     options: [
         {label: 'A', text: `导航卫星`},
@@ -2697,7 +2518,7 @@ const QUIZ_DATA = [
     answerText: `气象卫星`
   },
   {
-    id: 277,
+    id: 247,
     question: `2016年，朝鲜两次举行核试验，导致美国在朝鲜半岛部署先进导弹系统，即（ ）。`,
     options: [
         {label: 'A', text: `萨德系统`},
@@ -2709,7 +2530,7 @@ const QUIZ_DATA = [
     answerText: `萨德系统`
   },
   {
-    id: 278,
+    id: 248,
     question: `（ ）不是精确制导武器。`,
     options: [
         {label: 'A', text: `导弹`},
@@ -2721,7 +2542,7 @@ const QUIZ_DATA = [
     answerText: `坦克`
   },
   {
-    id: 279,
+    id: 249,
     question: `2020年9月8日，全国抗击新冠肺炎疫情表彰大会在北京人民大会堂隆重举行。中共中央总书记、国家主席、中央军委主席习近平向“共和国勋章”获得者（ ）颁授勋章。`,
     options: [
         {label: 'A', text: `钟南山`},
@@ -2733,7 +2554,7 @@ const QUIZ_DATA = [
     answerText: `钟南山`
   },
   {
-    id: 280,
+    id: 250,
     question: `世界上最先进的指挥信息系统是C4ISR系统，其中S是（ ）系统的简称。`,
     options: [
         {label: 'A', text: `侦察`},
@@ -2745,7 +2566,7 @@ const QUIZ_DATA = [
     answerText: `监视`
   },
   {
-    id: 281,
+    id: 251,
     question: `美国陆军主战坦克是（ ）。`,
     options: [
         {label: 'A', text: `豹2`},
@@ -2757,7 +2578,7 @@ const QUIZ_DATA = [
     answerText: `M1A2`
   },
   {
-    id: 282,
+    id: 252,
     question: `全球卫星导航定位系统中，( )为俄罗斯的定位系统。`,
     options: [
         {label: 'A', text: `GPS`},
@@ -2769,7 +2590,7 @@ const QUIZ_DATA = [
     answerText: `GLONSS`
   },
   {
-    id: 283,
+    id: 253,
     question: `2020年12月17日，嫦娥五号返回器携带月球样品安全着陆，标志着我国探月工程“（ ）”三步走规划如期完成。`,
     options: [
         {label: 'A', text: `送、落、回`},
@@ -2781,7 +2602,7 @@ const QUIZ_DATA = [
     answerText: `绕、落、回`
   },
   {
-    id: 284,
+    id: 254,
     question: `航空母舰是以（ ）为主要武器并作为其海上活动基地的大型水面战斗舰艇。`,
     options: [
         {label: 'A', text: `舰载机`},
@@ -2792,7 +2613,7 @@ const QUIZ_DATA = [
     answerText: `舰载机`
   },
   {
-    id: 285,
+    id: 255,
     question: `2020年7月23日，（ ）火星探测器搭乘长征五号运载火箭在中国海南文昌成功发射，开启火星探测之旅。`,
     options: [
         {label: 'A', text: `天舟二号`},
@@ -2802,6 +2623,223 @@ const QUIZ_DATA = [
     ],
     answerLabel: 'B',
     answerText: `天问一号`
+  },
+  {
+    id: 256,
+    question: '我国的国防手段包括（）等。',
+    options: [{ label: 'A', text: '军事手段' }, { label: 'B', text: '政治手段' }, { label: 'C', text: '经济手段' }, { label: 'D', text: '科技手段' }],
+    answerLabels: ['A', 'B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 257,
+    question: '我国社会主义制度和国防战略决定了我国的国防是（）。',
+    options: [{ label: 'A', text: '防御型' }, { label: 'B', text: '独立自主型' }, { label: 'C', text: '自卫型' }],
+    answerLabels: ['A', 'B', 'C'],
+    multiSelect: true,
+  },
+  {
+    id: 258,
+    question: '我国国防历史的主要启示有（）。',
+    options: [{ label: 'A', text: '经济发展' }, { label: 'B', text: '政治开明' }, { label: 'C', text: '国家的统一' }, { label: 'D', text: '民族的团结' }],
+    answerLabels: ['A', 'B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 259,
+    question: '抗美援朝时期涌现的英雄人物有很多，其中包括（）。',
+    options: [{ label: 'A', text: '黄继光' }, { label: 'B', text: '邱少云' }, { label: 'C', text: '雷锋' }, { label: 'D', text: '董存瑞' }],
+    answerLabels: ['A', 'B'],
+    multiSelect: true,
+  },
+  {
+    id: 260,
+    question: '我国现行的国防法规体系区分为（）层次。',
+    options: [{ label: 'A', text: '法律' }, { label: 'B', text: '法规' }, { label: 'C', text: '规章' }, { label: 'D', text: '地方性法规' }],
+    answerLabels: ['B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 261,
+    question: '信息化条件下国防动员内容包括（）。',
+    options: [{ label: 'A', text: '武装力量动员' }, { label: 'B', text: '信息动员' }, { label: 'C', text: '政治动员' }, { label: 'D', text: '国防经济动员' }, { label: 'E', text: '人民防空动员' }],
+    answerLabels: ['A', 'B', 'C', 'D', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 262,
+    question: '中国人民解放军火箭军装备的导弹，按照它们的射程可分为（）导弹。',
+    options: [{ label: 'A', text: '近程导弹' }, { label: 'B', text: '中程导弹' }, { label: 'C', text: '远程导弹' }, { label: 'D', text: '洲际导弹' }],
+    answerLabels: ['A', 'B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 263,
+    question: '国防教育的内容包括()等。（2分）',
+    options: [{ label: 'A', text: '国防理论' }, { label: 'B', text: '国防知识' }, { label: 'C', text: '国防历史' }, { label: 'D', text: '国防技能' }, { label: 'E', text: '国防法规' }],
+    answerLabels: ['B', 'C', 'D', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 264,
+    question: '随着科技不断发展，未来领土概念还将不断扩展，（）是未来有可能出现的全新领土概念。',
+    options: [{ label: 'A', text: '海底空间' }, { label: 'B', text: '宇宙空间' }, { label: 'C', text: '地下空间' }, { label: 'D', text: '网络信息空间' }],
+    answerLabels: ['B', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 265,
+    question: '现代国防观包括（）。',
+    options: [{ label: 'A', text: '全民国防观' }, { label: 'B', text: '全域国防观' }, { label: 'C', text: '综合国防观' }, { label: 'D', text: '世界国防观' }],
+    answerLabels: ['B', 'C'],
+    multiSelect: true,
+  },
+  {
+    id: 266,
+    question: '我国国防目的有（）。',
+    options: [{ label: 'A', text: '捍卫国家主权' }, { label: 'B', text: '维护国家统一' }, { label: 'C', text: '保卫国家领土完整' }, { label: 'D', text: '确保国家安全' }],
+    answerLabels: ['B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 267,
+    question: '中国的武装力量组成有（）。',
+    options: [{ label: 'A', text: '解放军现役部队' }, { label: 'B', text: '解放军预备役部队' }, { label: 'C', text: '警察部队' }, { label: 'D', text: '民兵' }],
+    answerLabels: ['B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 268,
+    question: '当前我军的战区包括（）战区。',
+    options: [{ label: 'A', text: '东' }, { label: 'B', text: '南' }, { label: 'C', text: '西' }, { label: 'D', text: '中' }, { label: 'E', text: '北' }],
+    answerLabels: ['B', 'C', 'D', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 269,
+    question: '战争准备包括物质准备和精神准备，（）属于精神准备。',
+    options: [{ label: 'A', text: '建造军事设施' }, { label: 'B', text: '进行国防动员' }, { label: 'C', text: '开展国防教育活动' }, { label: 'D', text: '研制武器装备' }],
+    answerLabels: ['C'],
+    multiSelect: true,
+  },
+  {
+    id: 270,
+    question: '实施军民融合发展战略的核心和实质是实现（）。（2分）',
+    options: [{ label: 'A', text: '信息互通' }, { label: 'B', text: '资源共享' }, { label: 'C', text: '良性互动' }, { label: 'D', text: '融合发展' }],
+    answerLabels: ['B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 271,
+    question: '国防动员按规模分为（）。（2分）',
+    options: [{ label: 'A', text: '局部动员' }, { label: 'B', text: '公开动员' }, { label: 'C', text: '秘密动员' }, { label: 'D', text: '总动员' }, { label: 'E', text: '应急动员' }],
+    answerLabels: ['D'],
+    multiSelect: true,
+  },
+  {
+    id: 272,
+    question: '空中信息化作战平台主要有（）。',
+    options: [{ label: 'A', text: '战斗机' }, { label: 'B', text: '无人机' }, { label: 'C', text: '运输机' }],
+    answerLabels: ['B', 'C'],
+    multiSelect: true,
+  },
+  {
+    id: 273,
+    question: '典型信息化空中作战平台有()。',
+    options: [{ label: 'A', text: '战斗机' }, { label: 'B', text: '运输机' }, { label: 'C', text: '轰炸机' }, { label: 'D', text: '预警机' }],
+    answerLabels: ['B', 'C'],
+    multiSelect: true,
+  },
+  {
+    id: 274,
+    question: '目前世界上掌握载人航天技术的国家有（）。',
+    options: [{ label: 'A', text: '中国' }, { label: 'B', text: '俄罗斯' }, { label: 'C', text: '美国' }, { label: 'D', text: '法国' }],
+    answerLabels: ['B', 'C'],
+    multiSelect: true,
+  },
+  {
+    id: 275,
+    question: '已装备我军的空中信息化作战平台有（）。',
+    options: [{ label: 'A', text: '运-20' }, { label: 'B', text: '歼-20' }, { label: 'C', text: '直-20' }, { label: 'D', text: '轰-20' }],
+    answerLabels: ['B', 'C'],
+    multiSelect: true,
+  },
+  {
+    id: 276,
+    question: '20世纪六七十年代，新中国在国防尖端科技领域取得的重大成就有（）。',
+    options: [{ label: 'A', text: '原子弹爆炸' }, { label: 'B', text: '杂交水稻' }, { label: 'C', text: '氢弾爆炸' }, { label: 'D', text: '人造卫星发射' }],
+    answerLabels: ['D'],
+    multiSelect: true,
+  },
+  {
+    id: 277,
+    question: '导弹按攻击目标可分为（）。',
+    options: [{ label: 'A', text: '巡航导弹' }, { label: 'B', text: '反舰导弹' }, { label: 'C', text: '反辐射导弹' }, { label: 'D', text: '反导弹导弹' }, { label: 'E', text: '反坦克导弹' }],
+    answerLabels: ['C', 'D', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 278,
+    question: '指挥信息系统主要有（）等组成。',
+    options: [{ label: 'A', text: '指挥控制系统' }, { label: 'B', text: '情报侦察系统' }, { label: 'C', text: '通信系统' }, { label: 'D', text: '预警探测系统' }, { label: 'E', text: '综合保障系统' }],
+    answerLabels: ['B', 'C', 'D', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 279,
+    question: '新概念武器与其它武器本质的区别，在于（）等。',
+    options: [{ label: 'A', text: '基本原理不同' }, { label: 'B', text: '杀伤机理不同' }, { label: 'C', text: '作战方式不同' }, { label: 'D', text: '使用时机不同' }],
+    answerLabels: ['A', 'B', 'C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 280,
+    question: '美国的无人机有（）。',
+    options: [{ label: 'A', text: 'RQ-4' }, { label: 'B', text: 'MQ-1' }, { label: 'C', text: 'U-2' }, { label: 'D', text: 'X-47B' }],
+    answerLabels: ['A', 'B', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 281,
+    question: '2021年2月，因在边境冲突中誓死捍卫国土，中央军委给（）追记一等功。',
+    options: [{ label: 'A', text: '陈红军' }, { label: 'B', text: '祁发宝' }, { label: 'C', text: '肖思远' }, { label: 'D', text: '陈祥榕' }, { label: 'E', text: '王焯冉' }],
+    answerLabels: ['C', 'D', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 282,
+    question: '信息化装备的发展趋势是（）。',
+    options: [{ label: 'A', text: '无人化' }, { label: 'B', text: 'b—体化' }, { label: 'C', text: '智能化' }, { label: 'D', text: '打击精确化' }, { label: 'E', text: '隐形化' }],
+    answerLabels: ['C', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 283,
+    question: '第四代超声速战斗机的代表机型有(）。(2分）',
+    options: [{ label: 'A', text: 'F-22' }, { label: 'B', text: '歼-20' }, { label: 'C', text: '苏-57' }, { label: 'D', text: 'B-2' }, { label: 'E', text: 'F-35' }],
+    answerLabels: ['A', 'B', 'C', 'E'],
+    multiSelect: true,
+  },
+  {
+    id: 284,
+    question: '拥有核潜艇的国家是（）。（2分）',
+    options: [{ label: 'A', text: '日本' }, { label: 'B', text: '中国' }, { label: 'C', text: '俄罗斯' }, { label: 'D', text: '美国' }],
+    answerLabels: ['C', 'D'],
+    multiSelect: true,
+  },
+  {
+    id: 285,
+    question: `2021年2月，因在边境冲突中誓死捍卫国土，中央军委追授（ ）“卫国戍边英雄”荣誉称号。`,
+    options: [
+        {label: 'A', text: `陈红军`},
+        {label: 'B', text: `祁发宝`},
+        {label: 'C', text: `肖思远`},
+        {label: 'D', text: `陈祥榕`},
+        {label: 'E', text: `王焯冉`}
+    ],
+    multiSelect: true,
+    answerLabels: ['A'],
+    answerText: `陈红军`
   }
 ]
 
@@ -2821,7 +2859,7 @@ function init() {
   document.getElementById('totalCount').textContent = QUIZ_DATA.length;
   
   // 版本检测：题库更新后清除旧数据
-  const DATA_VERSION = 2;
+  const DATA_VERSION = 3;
   const savedVersion = parseInt(localStorage.getItem('quiz_data_version') || '0');
   if (savedVersion !== DATA_VERSION) {
     localStorage.removeItem('quiz_state');
@@ -2921,10 +2959,33 @@ function setMode(mode, skipSave) {
   }
   
   if (!skipSave) saveState();
+  
+  var redoBtn = document.getElementById('wrongRedoBtn');
+  if (redoBtn) {
+    redoBtn.style.display = (mode === 'wrong') ? 'flex' : 'none';
+  }
+  
   renderQuestions();
 }
 
 // ─── Get Filtered Questions ───────────────────────────
+function redoWrongMode() {
+  var wrongIds = Object.keys(isCorrect).filter(function(k) { return isCorrect[k] === false; });
+  if (wrongIds.length === 0) {
+    alert('没有错题可以重刷！');
+    return;
+  }
+  if (!confirm('确定要清除这 ' + wrongIds.length + ' 道错题的答案重新做吗？')) return;
+  
+  wrongIds.forEach(function(k) {
+    delete userAnswers[k];
+    delete isCorrect[k];
+  });
+  
+  saveState();
+  setMode('wrong');
+}
+
 function getFilteredQuestions() {
   let filtered = [];
   
@@ -3045,8 +3106,9 @@ function renderQuestions() {
       <div class="question-card ${cardClass}">
         <div class="question-number ${numClass}">${qid}</div>
         <div class="question-text">${q.question}</div>
+        ${q.multiSelect && !(qid in isCorrect) ? '<div class="multi-hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> 多选题：请选择所有正确答案后点击下方"确认提交"</div>' : ''}
         <div class="options-list">${optionsHtml}</div>
-        ${q.multiSelect && !answered ? `<button class="confirm-btn" onclick="confirmMultiSelect(${qid})">确认提交</button>` : ''}
+        ${q.multiSelect && !(qid in isCorrect) ? `<button class="confirm-btn" onclick="confirmMultiSelect(${qid})">确认提交</button>` : ''}
         ${feedbackHtml}
       </div>`;
   }).join('');
@@ -3182,6 +3244,20 @@ function nextPage() {
     renderQuestions();
     window.scrollTo(0, 0);
   }
+}
+
+function jumpToPage() {
+  const input = document.getElementById('pageJumpInput');
+  const page = parseInt(input.value);
+  const filtered = getFilteredQuestions();
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  if (isNaN(page) || page < 1 || page > totalPages) {
+    alert('请输入有效的页码（1-' + totalPages + '）');
+    return;
+  }
+  currentPage = page - 1;
+  renderQuestions();
+  window.scrollTo(0, 0);
 }
 
 // ─── Theme Toggle ─────────────────────────────────────
